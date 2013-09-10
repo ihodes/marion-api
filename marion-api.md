@@ -17,38 +17,37 @@ Auth is basic auth, username 'api' and password <api-key>.
 
 A Person is the entity interacting with a message Protocol. They're the ones with the cell phones, responding to SMS messages.
 
-    id            ::  uuid
-    object        ::  "person"
+    id            ::  string
+    object        ::  string ("person")
     active        ::  boolean (default: true)
-    params        ::  array of key:values    
+    params        ::  [key:values, ...]
 
 
 ### The Schedule Object
 
 A schedule ties a Protocol to a Person, initiating the protocol on a recurring basis (starting at `start_at`), or once, depending on the `frequency`.
 
-    id            ::  uuid
-    object        ::  "schedule"
+    id            ::  string
+    object        ::  string ("schedule")
     active        ::  boolean (default: true)
-    protocol_id   ::  uuid 
+    protocol_id   ::  string 
     start_at      ::  timestamp
     frequency     ::  string \in [daily, monday..sunday, once]
 
 
-### The Response Object [not at all close to final]
+### The Response Object
 
-Responses represent people's responses to Protocols messages, and their intents with those responses... TBD...
+Responses represent a Person's response to a given Protocol. 
 
-*Being revised... responses probably shouldn't be so "dumb" and as granular--they should represent the intent of the Person's response. E.g. should be able to reprsent "Yes, confirmed that I will be there" to a Protocol which is asking "We're confirming your appt on Monday at 12:30PM; will you be there?"*
+`intent` is a summary of Person's communication via the protocol. `messages_exchanged` is a map of state_strings to messages recieved from the Person at that State. `completed_at` is the time at which the Protocol reached a terminal state, or timed out (thus terminating the Protocol).
 
-    id                    ::  uuid
-    object                ::  "response"
-    person_id             ::  uuid
-    protocol_id           ::  uuid
-    state_id              ::  uuid
-    received_at           ::  datetime
-    response_text         ::  string
-    parsed_response_text  ::  string
+    id                    ::  string
+    object                ::  string ("response")
+    person_id             ::  string
+    protocol_id           ::  string
+    intent                ::  string
+    completed_at          ::  datetime
+    messages_exchanged    ::  {string:string}
     
     
 ### The Protocol Object
@@ -57,10 +56,10 @@ A protocol is a script reprsenting messages sent out by Marion SMS and the conse
 
 Protocols are created with a name and description, and states are then added to it. In order for a Protocol to be valid, one State must be designated the initial state, and ther emust be a path to a terminal state from there. There may be no non-terminating sequences; the protocol must halt.
 
-    id                ::  uuid
-    object            ::  "protocol"
-    state_ids         ::  [uuid, ...]
-    initial_state_id  ::  uuid
+    id                ::  string
+    object            ::  string ("protocol")
+    state_ids         ::  [string, ...]
+    initial_state_id  ::  string
     name              ::  string
     description       ::  string
     
@@ -69,9 +68,9 @@ Protocols are created with a name and description, and states are then added to 
 
 A schedule ties a Protocol to a Person, initiating the protocol on a recurring basis (starting at `start_at`), or once, depending on the `frequency`.
 
-    id                ::  uuid
-    object            ::  "state"
-    protocol_id       ::  uuid
+    id                ::  string
+    object            ::  string ("state")
+    protocol_id       ::  string
     terminal          ::  boolean
     on_enter          ::  {messages: [string, ...], webhooks: [url, ...]}
     transitions       ::  {transition:state_id, ...}
@@ -152,7 +151,7 @@ A transition is a string that specifies the kind of response which will lead to 
 *NB This does NOT delete the responses associated with the object, and you can still retrieve this schedule by ID.*
 
 
-### Response [not at all close to final]
+### Response
 
 **[PRIVATE] Create a new response, returning it.**  
 `POST /patient/{PATIENT_ID}/responses`  
