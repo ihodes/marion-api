@@ -2,26 +2,29 @@
 // Sept 2013
 'use strict';
 
-// mock for now
-var success = function (msg) { return { success: msg }; };
+var Person = require('../models/person'),
+    utils  = require('../utils');
+var ERRORS = utils.ERRORS;
+
 
 exports.getPeople = function (req, res) {
-    res.send(success('getPeople'));
-}
+    Person.allPeople(req, utils.sendBack(res, function(res) {
+        return { people: res };
+    }));
+};
 
-exports.createPerson = function (req, res) {
-    res.send(success('createPerson'));
-}
+exports.createPerson = function(req, res) {
+    Person.createPerson(req, utils.sendBack(res));
+};
 
-exports.getPerson = function (req, res) {
-    res.send(success('getPerson ' + req.params.personid));
-}
+exports.getPerson = function(req, res) {
+    Person.getPerson(req, utils.sendBack(res));
+};
 
-exports.updatePerson = function (req, res) {
-    res.send(success('updatePerson ' + req.params.personid ));
-}
+exports.updatePerson = function(req, res) {
+    Person.updatePerson(req, utils.sendBack(res));
+};
 
-exports.deletePerson = function (req, res) {
-    res.send(success('deletePerson ' + req.params.personid));
-}
-
+exports.deletePerson = function(req, res) {
+    Person.deletePerson(req, utils.sendBack(res));
+};

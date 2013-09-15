@@ -2,26 +2,32 @@
 // Sept 2013
 'use strict';
 
-// mock for now
-var success = function (msg) { return { success: msg }; };
+
+var Schedule = require('../models/schedule'),
+    utils    = require('../utils');
+
 
 exports.getSchedules = function (req, res) {
-    res.send(success('getSchedules'));
-}
+    Schedule.allSchedules(req.personid, req.body, function(err, results) {
+        if(err) console.log(error);
+        else res.send({schedules: results});
+    });
+};
 
-exports.createSchedule = function (req, res) {
-    res.send(success('createSchedule'));
-}
+exports.createSchedule = function(req, res) {
+    Schedule.createSchedule(req.params.personid, req.body,
+                            utils.sendBack(res));
+};
 
-exports.getSchedule = function (req, res) {
-    res.send(success('getSchedule ' + req.params.scheduleid));
-}
+exports.getSchedule = function(req, res) {
+    Schedule.getSchedule(req.params.scheduleid, utils.sendBack(res));
+};
 
-exports.updateSchedule = function (req, res) {
-    res.send(success('updateSchedule ' + req.params.scheduleid));
-}
+exports.updateSchedule = function(req, res) {
+    Schedule.updateSchedule(req.params.scheduleid, req.body,
+                            utils.sendBack(res));
+};
 
-exports.deleteSchedule = function (req, res) {
-    res.send(success('deleteSchedule ' + req.params.scheduleid));
-}
-
+exports.deleteSchedule = function(req, res) {
+    Schedule.deleteSchedule(req.params.scheduleid, utils.sendBack(res));
+};

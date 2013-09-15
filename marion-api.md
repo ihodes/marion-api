@@ -7,9 +7,10 @@ Auth is basic auth, username 'api' and password <api-key>.
 ## Resources
 
 * Person
-  * Schedule
-  * Response
+* Schedule
+* Response
 * Protocol
+  * ProtocolInstance
   * State
 
 
@@ -18,9 +19,8 @@ Auth is basic auth, username 'api' and password <api-key>.
 A Person is the entity interacting with a message Protocol. They're the ones with the cell phones, responding to SMS messages.
 
     id            ::  string
-    object        ::  string ("person")
     active        ::  boolean (default: true)
-    params        ::  [key:values, ...]
+    params        ::  {}
 
 
 ### The Schedule Object
@@ -28,10 +28,9 @@ A Person is the entity interacting with a message Protocol. They're the ones wit
 A schedule ties a Protocol to a Person, initiating the protocol on a recurring basis (starting at `start_at`), or once, depending on the `frequency`.
 
     id            ::  string
-    object        ::  string ("schedule")
     active        ::  boolean (default: true)
-    protocol_id   ::  string 
-    start_at      ::  timestamp
+    protocolId    ::  string 
+    startAt       ::  timestamp
     frequency     ::  string \in [daily, monday..sunday, once]
 
 
@@ -42,7 +41,6 @@ Responses represent a Person's response to a given Protocol.
 `intent` is a summary of Person's communication via the protocol. `messages_exchanged` is a map of state_strings to messages recieved from the Person at that State. `completed_at` is the time at which the Protocol reached a terminal state, or timed out (thus terminating the Protocol).
 
     id                    ::  string
-    object                ::  string ("response")
     person_id             ::  string
     protocol_id           ::  string
     intent                ::  string
@@ -57,19 +55,24 @@ A protocol is a script reprsenting messages sent out by Marion SMS and the conse
 Protocols are created with a name and description, and states are then added to it. In order for a Protocol to be valid, one State must be designated the initial state, and ther emust be a path to a terminal state from there. There may be no non-terminating sequences; the protocol must halt.
 
     id                ::  string
-    object            ::  string ("protocol")
     state_ids         ::  [string, ...]
     initial_state_id  ::  string
     name              ::  string
     description       ::  string
     
     
+### The ProtocolInstance
+
+A "run" of the Protocol on a Person at a given Scheduled time; contains its responses and the intent Person wished to convey with her answers.
+
+...
+
+    
 ### The State Object
 
 A schedule ties a Protocol to a Person, initiating the protocol on a recurring basis (starting at `start_at`), or once, depending on the `frequency`.
 
     id                ::  string
-    object            ::  string ("state")
     protocol_id       ::  string
     terminal          ::  boolean
     on_enter          ::  {messages: [string, ...], webhooks: [url, ...]}
