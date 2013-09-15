@@ -18,7 +18,7 @@ Auth is basic auth, username 'api' and password <api-key>.
 
 A Person is the entity interacting with a message Protocol. They're the ones with the cell phones, responding to SMS messages.
 
-    id            ::  string
+    id            ::  id
     active        ::  boolean (default: true)
     params        ::  {}
 
@@ -27,10 +27,11 @@ A Person is the entity interacting with a message Protocol. They're the ones wit
 
 A schedule ties a Protocol to a Person, initiating the protocol on a recurring basis (starting at `start_at`), or once, depending on the `frequency`.
 
-    id            ::  string
+    id            ::  id
     active        ::  boolean (default: true)
-    protocolId    ::  string 
-    startAt       ::  timestamp
+    person        ::  id, references Person
+    protocol      ::  id, references Protocol
+    sendTime      ::  string (HH:MM:SS)
     frequency     ::  string \in [daily, monday..sunday, once]
 
 
@@ -40,9 +41,9 @@ Responses represent a Person's response to a given Protocol.
 
 `intent` is a summary of Person's communication via the protocol. `messages_exchanged` is a map of state_strings to messages recieved from the Person at that State. `completed_at` is the time at which the Protocol reached a terminal state, or timed out (thus terminating the Protocol).
 
-    id                    ::  string
-    person_id             ::  string
-    protocol_id           ::  string
+    id                    ::  id
+    person                ::  id, references Person
+    protocol              ::  id, references Protocol
     intent                ::  string
     completed_at          ::  datetime
     messages_exchanged    ::  {string:string}
@@ -54,9 +55,9 @@ A protocol is a script reprsenting messages sent out by Marion SMS and the conse
 
 Protocols are created with a name and description, and states are then added to it. In order for a Protocol to be valid, one State must be designated the initial state, and ther emust be a path to a terminal state from there. There may be no non-terminating sequences; the protocol must halt.
 
-    id                ::  string
-    state_ids         ::  [string, ...]
-    initial_state_id  ::  string
+    id                ::  id
+    states            ::  [id, references State, ...]
+    initial_state     ::  id, references State
     name              ::  string
     description       ::  string
     
@@ -72,8 +73,8 @@ A "run" of the Protocol on a Person at a given Scheduled time; contains its resp
 
 A schedule ties a Protocol to a Person, initiating the protocol on a recurring basis (starting at `start_at`), or once, depending on the `frequency`.
 
-    id                ::  string
-    protocol_id       ::  string
+    id                ::  id
+    protocol          ::  id, references Protocol
     terminal          ::  boolean
     on_enter          ::  {messages: [string, ...], webhooks: [url, ...]}
     transitions       ::  {transition:state_id, ...}

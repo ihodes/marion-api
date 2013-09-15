@@ -5,7 +5,7 @@ var mongoose = require('mongoose'),
     config   = require('../config'),
     _        = require('underscore'),
     uuid     = require('node-uuid');
-
+var ObjectId = mongoose.Schema.ObjectId;
 
 var connect = function () {
     mongoose.connect(config.settings.MONGO);
@@ -51,21 +51,25 @@ connect();
 
 
 var personSchema = new mongoose.Schema({
-    organizationId: {type: mongoose.Schema.ObjectId, required: true},
+    organization: {type: ObjectId, required: true, ref: 'organization'},
     params: {type: Object},
     active: {type: Boolean, default: true},
     createdAt: {type: Date, default: Date.now}
 });
+// personSchema.post("save", function(person) {
+//     // Test if Person is new, then note that, too.
+//     console.log(person.organization.name," saved Person(",person._id,")");
+// });
 exports.Person = mongoose.model('person', personSchema);
 
 
 var scheduleSchema = new mongoose.Schema({
-    organizationId: {type: mongoose.Schema.ObjectId, required: true},
-    personId: {type: mongoose.Schema.ObjectId, required: true},
-    protocolId: {type: mongoose.Schema.ObjectId, required: true},
+    organization: {type: ObjectId, required: true, ref: 'organization'},
+    person: {type: ObjectId, required: true, ref: 'person'},
+    protocol: {type: ObjectId, required: true, ref: 'protocol'},
 
     active: {type: Boolean, default: true},
-    time: {type: Date, required: true},
+    sendTime: {type: String, required: true},
     frequency: {type: String, required: true},
     createdAt: {type: Date, default: Date.now}
 });

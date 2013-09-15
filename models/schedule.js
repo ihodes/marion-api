@@ -8,35 +8,33 @@ var _      = require('underscore'),
     utils  = require('../utils');
 
 
-var SCHEDULE_PARAM_WHITELIST = ['_id', 'frequency', 'time', 'active',
-                                'personId', 'protocolId', 'createdAt'];
-
-
-var cleaner = utils.cleaner(SCHEDULE_PARAM_WHITELIST);
-var screen = utils.safeCallbacks(cleaner);
-
-
-exports.allSchedules = function(params, callback) {
-    db.Schedule.find(screen(callback));
+exports.allSchedules = function(org, params, callback) {
+    db.Schedule.find({ organization: org }, callback);
 };
 
-exports.createSchedule = function(params, callback) {
-    db.Schedule(cleaner(params)).save(screen(callback));
+exports.createSchedule = function(org, params, callback) {
+    db.Schedule(_.extend(params, { organization: org }))
+               .save(callback);
 };
 
-exports.getSchedule = function(scheduleid, callback) {
-    db.Schedule.findById(scheduleid, screen(callback));
+exports.getSchedule = function(org, scheduleId, callback) {
+    var query = { _id: scheduleId, organization: org };
+    db.Schedule.findOne(query, callback);
 };
 
-exports.updateSchedule = function(scheduleid, params, callback) {
-    db.Schedule.findById(scheduleid, function(err, schedule) {
-        params = cleaner(params);
+exports.updateSchedule = function(org, scheduleId, params, callback) {
+    var query = { _id: scheduleId, organization: org };
+    db.Schedule.findOne(query, function(err, schedule) {
+        if(!schedule) return callback(err, null);
         for(var key in params)
             schedule[key] = params[key];
-        schedule.save(screen(callback));
+        schedule.save(callback);
     });
 };
 
-exports.deleteSchedule = function(scheduleid, callback) {
-    db.Schedule.findByIdAndRemove(scheduleid, screen(callback));
+exports.deleteSchedule = function(org, scheduleId, callback) {
+    var query = { _id: scheduleId, organization: org };
+    db.Schedule.findOne(query, function(err, schedule) {
+        return schedule.remove(function(err) { callback(err, schedule); });
+    });
 };

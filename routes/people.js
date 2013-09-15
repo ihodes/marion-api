@@ -17,15 +17,15 @@ exports.createPerson = function(req, res) {
 };
 
 exports.getPerson = function(req, res) {
-    Person.getPerson(req.user, req.params.personid, utils.sendBack(res));
+    Person.getPerson(req.user, req.params.personId, utils.sendBack(res));
 };
 
 exports.updatePerson = function(req, res) {
-    Person.updatePerson(req.user, req.params.personid, req.body,
+    Person.updatePerson(req.user, req.params.personId, req.body,
                         utils.sendBack(res));
 };
 
 exports.deletePerson = function(req, res) {
-    Person.deletePerson(req.user, req.params.personid, req.body,
+    Person.deletePerson(req.user, req.params.personId, req.body,
                         utils.sendBack(res));
 };

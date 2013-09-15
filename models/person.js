@@ -13,28 +13,27 @@ var cleaner = utils.cleaner(PERSON_PARAM_WHITELIST);
 var screen = utils.safeCallbacks(cleaner);
 
 
-exports.allPeople = function(org,  callback) {
-    db.Person.find({ organizationId: org._id }, screen(callback));
+exports.allPeople = function(org, callback) {
+    db.Person.find({ organization: org }, screen(callback));
 };
 
 exports.createPerson = function(org, params, callback) {
     var params = cleaner(params);
-    params = _.extend(params, { organizationId: org._id });
+    params = _.extend(params, { organization: org });
     db.Person(params).save(screen(callback));
 };
 
-exports.getPerson = function(org, personid, callback) {
-    var query = { organizationId: org._id, _id: personid };
+exports.getPerson = function(org, personId, callback) {
+    var query = { organization: org, _id: personId };
     db.Person.findOne(query, screen(callback));
 };
 
-exports.updatePerson = function(org, personid, params, callback) {
-    var query = { organizationId: org._id, _id: personid };
+exports.updatePerson = function(org, personId, params, callback) {
+    var query = { organization: org, _id: personId };
     db.Person.findOne(query, function(err, person) {
         var cb = screen(callback);
         if(!person) return cb(err, null);
-        if(params.active)
-            person.active = params.active;
+        if(params.active) person.active = params.active;
         for(var key in params.params) {
             person.params[key] = params.params[key];
             person.markModified('params.'+key);
@@ -43,8 +42,8 @@ exports.updatePerson = function(org, personid, params, callback) {
     });
 };
 
-exports.deletePerson = function(org, personid, params, callback) {
-    var query = { organizationId: org._id, _id: personid };
+exports.deletePerson = function(org, personId, params, callback) {
+    var query = { organization: org, _id: personId };
     db.Person.findOne(query, function(err, person) {
         var cb = screen(callback);
         if(person && params.confirm == 'true')

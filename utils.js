@@ -10,7 +10,7 @@ var _ = require('underscore');
 
 var ERRORS = {
     badRequest:    {status: 400, error: "Bad Request",
-                    message: "Missing required parameter(s)."},
+                    message: "Missing or bad parameter(s)."},
     unauthorized:  {status: 401, error: "Unauthorized",
                     message: "Missing API Key."},
     requestFailed: {status: 402, error: "Request Failed",
@@ -23,6 +23,7 @@ var ERRORS = {
 }
 exports.ERRORS = ERRORS;
 
+
 // Use as a simple callback which sends the results or errors to the response
 // object `res`. If a `transform` function is given, it is applied that to 
 // results before sending.
@@ -34,11 +35,15 @@ exports.ERRORS = ERRORS;
 exports.sendBack = function(res, transform) {
     if(!transform) transform = _.identity;
     return function(err, results) {
-        if (err) return error(res, ERRORS.internalServerError);
         if (!results) return error(res, ERRORS.notFound);
+        if (err) {
+            console.log(err);
+            return error(res, ERRORS.internalServerError);
+        }
         return res.send(transform(results));
     }
 };
+
 
 // Validates (nested TK TODO) params of a request, ensuring all required 
 // params are present, and runs the callback if so. If not, 400 errors out.
@@ -48,22 +53,19 @@ exports.validateParams = function(req, res, paramList, callback) {
     else utils.error(res, ERRORS.badRequest);
 };
 
+
 // Send an error with appropriate status code (from ERRORS) to the response
-// object `res`.
+// object `res`. Pass `addnl` (object) to add more information to the error.
 //
 // e.g. If a resourse is not found: 
 //      error(res, ERRORS.notFound);
 //      // (to `res`) => HTTP/1.1 404 Not Found  ...
 //      //               {status: 404, error: "Not Found" ... }
 //
-var error = function(res, err) {
-    return res.status(err.status).send(err);
+var error = function(res, err, addnl) {
+    return res.status(err.status).send(_.extend(err, addnl));
 }
 exports.error = error;
-
-  ////////////////////////////
- //       For Models       //
-////////////////////////////
 
 // Returns a function which returns a "cleaned" resource object; 
 // only allowing through parameters which are on the whitelist. 
@@ -75,6 +77,8 @@ exports.cleaner = function(whitelist) {
 };
 
 
+
+// depreciated... (not used...)
 // Returns a function which creates callback functions that only allow the
 // params `cleaner` allows through. Useful for models.
 //

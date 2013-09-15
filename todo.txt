@@ -1,0 +1,10 @@
+# Validations
+-- Should validations be entirely on the models, with a layer on top of that 
+-- to return the correct HTTP code and error messages with the response?
+   * NB Mongoose validations are pretty shitty. Also, tying validations to 
+        the database/adapter is not composable. Better to validate on model 
+        then the schema--stick validations on models/.., (but models shouldn't
+        be aware of HTTP codes... let routes/.. callbacks handle that).
+*  Validate that ObjectIds passed in refer to a real, org-owned object
+*  Validate times (sendTime, recievedTime, etc) (use moment.js?)
+*  Validate allowed frequencies? Is this something the API should facilitate?
