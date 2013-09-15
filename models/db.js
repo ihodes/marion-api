@@ -51,7 +51,7 @@ connect();
 
 
 var personSchema = new mongoose.Schema({
-    // organizationId: {type: mongoose.Schema.ObjectId, required: true},
+    organizationId: {type: mongoose.Schema.ObjectId, required: true},
     params: {type: Object},
     active: {type: Boolean, default: true},
     createdAt: {type: Date, default: Date.now}
@@ -60,7 +60,7 @@ exports.Person = mongoose.model('person', personSchema);
 
 
 var scheduleSchema = new mongoose.Schema({
-    // organizationId: {type: mongoose.Schema.ObjectId, required: true},
+    organizationId: {type: mongoose.Schema.ObjectId, required: true},
     personId: {type: mongoose.Schema.ObjectId, required: true},
     protocolId: {type: mongoose.Schema.ObjectId, required: true},
 
