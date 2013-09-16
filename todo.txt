@@ -8,3 +8,6 @@
 *  Validate that ObjectIds passed in refer to a real, org-owned object
 *  Validate times (sendTime, recievedTime, etc) (use moment.js?)
 *  Validate allowed frequencies? Is this something the API should facilitate?
+
+
+* Don't fail with 500 if id isn't ObjectId Format (just FAIL 404)

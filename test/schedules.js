@@ -6,7 +6,7 @@ var request  = require('request'),
     config   = require('./testsettings');
 var BASE = config.SETTINGS.URL;
 
-describe('schedules', function() {
+describe('Schedules', function() {
     var schedule = {
         frequency: 'daily',
         sendTime: '12:00:00',
@@ -14,7 +14,7 @@ describe('schedules', function() {
         protocol: '41224d776a326fb40f000001'
     }
 
-    describe('POST /v1/schedules', function () {
+    describe('POST /v1/schedules...', function () {
         it('Should respond 200 with schedule',
            function(done) {
                var path = BASE + 'schedules';
@@ -37,7 +37,7 @@ describe('schedules', function() {
            });
     });
 
-    describe('GET /v1/schedules', function () {
+    describe('GET /v1/schedules...', function () {
         it('Should respond with schedules',
            function(done) {
                var path = BASE + 'schedules';
@@ -58,7 +58,7 @@ describe('schedules', function() {
            });
     });
 
-    describe('POST /v1/schedule/:id', function () {
+    describe('POST /v1/schedule/:id...', function () {
         it('Should respond with updated schedule',
            function(done) {
                var path = BASE + 'schedule/' + schedule._id;
@@ -82,7 +82,7 @@ describe('schedules', function() {
            });
     });
 
-    describe('GET /v1/schedule/:id', function () {
+    describe('GET /v1/schedule/:id...', function () {
         it('Should respond with schedule',
            function(done) {
                var path = BASE + 'schedule/' + schedule._id;
@@ -103,7 +103,7 @@ describe('schedules', function() {
            });
     });
 
-    describe('DELETE /v1/schedule/:id', function () {
+    describe('DELETE /v1/schedule/:id...', function () {
         it('Should respond with schedule',
            function(done) {
                var path = BASE + 'schedule/' + schedule._id;

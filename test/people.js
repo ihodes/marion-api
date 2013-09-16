@@ -6,7 +6,9 @@ var request  = require('request'),
     config   = require('./testsettings');
 var BASE = config.SETTINGS.URL;
 
-describe('people', function() {
+
+
+describe('People', function() {
     var person = {
         params: {
             name: "Bilbo Baggins",
@@ -14,7 +16,7 @@ describe('people', function() {
         }
     }
 
-    describe('POST /v1/people', function () {
+    describe('POST /v1/people...', function () {
         it('Should respond 200 with person', 
            function(done) {
                var path = BASE + 'people';
@@ -37,7 +39,21 @@ describe('people', function() {
            });
     });
 
-    describe('GET /v1/people', function () {
+    describe('POST /v1/people unauthorized...', function () {
+        it('Should respond with 401 unauthorized', 
+           function(done) {
+               var path = config.SETTINGS.UNAUTH_URL + 'people';
+               console.log('POST ', path, JSON.stringify(person));
+
+               request.post(path, {form: person}, function(err, res, body) {
+                   if(err) throw err;
+                   if(res.statusCode != 401) throw new Error('Status != 401');
+                   done()
+               });
+           });
+    });
+
+    describe('GET /v1/people...', function () {
         it('Should respond with people', 
            function(done) {
                var path = BASE + 'people';
@@ -58,7 +74,7 @@ describe('people', function() {
            });
     });
 
-    describe('POST /v1/person/:id', function () {
+    describe('POST /v1/person/:id...', function () {
         it('Should respond with updated person', 
            function(done) {
                var path = BASE + 'person/' + person._id;
@@ -84,7 +100,7 @@ describe('people', function() {
            });
     });
 
-    describe('GET /v1/person/:id', function () {
+    describe('GET /v1/person/:id...', function () {
         it('Should respond with person', 
            function(done) {
                var path = BASE + 'person/' + person._id;
@@ -105,7 +121,21 @@ describe('people', function() {
            });
     });
 
-    describe('DELETE /v1/person/:id', function () {
+    describe('GET /v1/person/:id wrong id...', function () {
+        it('Should respond with 404', 
+           function(done) {
+               var path = BASE + 'person/' + '52363f8cb591000000000001';
+               console.log('GET ', path);
+
+               request.post(path, {}, function(err, res, body) {
+                   if(err) throw err;
+                   if(res.statusCode != 404) throw new Error('Status != 200');
+                   done()
+               });
+           });
+    });
+
+    describe('DELETE /v1/person/:id...', function () {
         it('Should respond with person', 
            function(done) {
                var path = BASE + 'person/' + person._id;
