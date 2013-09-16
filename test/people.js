@@ -4,8 +4,8 @@ var request  = require('request'),
     assert   = require('assert'),
     should   = require('should'),
     config   = require('./testsettings');
-var BASE = config.SETTINGS.URL;
-
+var BASE = config.auth_url(config.SETTINGS.ORG_KEY);
+var UNAUTH_BASE = config.auth_url('bad-key');
 
 
 describe('People', function() {
@@ -42,7 +42,7 @@ describe('People', function() {
     describe('POST /v1/people unauthorized...', function () {
         it('Should respond with 401 unauthorized', 
            function(done) {
-               var path = config.SETTINGS.UNAUTH_URL + 'people';
+               var path = UNAUTH_BASE + 'people';
                console.log('POST ', path, JSON.stringify(person));
 
                request.post(path, {form: person}, function(err, res, body) {
@@ -124,7 +124,7 @@ describe('People', function() {
     describe('GET /v1/person/:id wrong id...', function () {
         it('Should respond with 404', 
            function(done) {
-               var path = BASE + 'person/' + '52363f8cb591000000000001';
+               var path = BASE + 'person/' + 'no-id-here';
                console.log('GET ', path);
 
                request.post(path, {}, function(err, res, body) {

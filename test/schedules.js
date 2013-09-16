@@ -4,7 +4,8 @@ var request  = require('request'),
     assert   = require('assert'),
     should   = require('should'),
     config   = require('./testsettings');
-var BASE = config.SETTINGS.URL;
+var BASE = config.auth_url(config.SETTINGS.ORG_KEY);
+
 
 describe('Schedules', function() {
     var schedule = {
