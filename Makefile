@@ -1,2 +1,8 @@
 all:
-	/usr/local/bin/mocha
+	foreman run supervisor app.js
+
+
+.PHONY: test
+
+test:
+	./tests

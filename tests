@@ -1,0 +1,10 @@
+#! /usr/bin/env bash
+
+# hacky as fuuuuuuuuu 
+
+while read p ; do export $p; done < .test_env
+mongo --eval "db.organizations.remove(); db.organizations.insert({name: \"test\", key: \"5dcc7a1b-bd51-4324-bfd0-52be50606d27\"})" marionapitest
+supervisor app.js &
+PID=$!
+sleep 2 && mocha
+sleep 5 && kill $PID # ugh
