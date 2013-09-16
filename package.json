@@ -10,7 +10,10 @@
         "node-uuid": "1.4.0",
         "express-namespace": "0.1.1",
         "mongoose": "3.6.19",
-        "underscore": "1.5.2"
+        "underscore": "1.5.2",
+        "moment": "2.1.0",
+        "request": "2.27.0",
+        "should": "1.2.2"
     },
     "engines": {
         "node": "0.10.x",
