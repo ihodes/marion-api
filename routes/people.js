@@ -3,29 +3,36 @@
 'use strict';
 
 var Person = require('../models/person'),
-    utils  = require('../utils');
+    U      = require('../utils');
 
 
 exports.getPeople = function (req, res) {
-    Person.allPeople(req.user, utils.sendBack(res, function(res) {
+    var allowed = {params: {}, active: ['true', 'false']};
+    if(!U.validates(req.body, allowed, {}))
+       return U.error(res, U.ERRORS.badRequest);
+    Person.allPeople(req.user, U.sendBack(res, function(res) {
         return { people: res };
     }));
 };
 
 exports.createPerson = function(req, res) {
-    Person.createPerson(req.user, req.body, utils.sendBack(res));
+    Person.createPerson(req.user, req.body, U.sendBack(res));
 };
 
 exports.getPerson = function(req, res) {
-    Person.getPerson(req.user, req.params.personId, utils.sendBack(res));
+    Person.getPerson(req.user, req.params.personId, U.sendBack(res));
 };
 
 exports.updatePerson = function(req, res) {
+    var allowed = {params: {}, active: ['true', 'false']};
+    if(!U.validates(req.body, allowed, {}))
+       return U.error(res, U.ERRORS.badRequest);
     Person.updatePerson(req.user, req.params.personId, req.body,
-                        utils.sendBack(res));
+                        U.sendBack(res));
 };
 
 exports.deletePerson = function(req, res) {
     Person.deletePerson(req.user, req.params.personId, req.body,
-                        utils.sendBack(res));
+                        U.sendBack(res));
 };
+

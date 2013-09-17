@@ -105,3 +105,95 @@ exports.safeCallbacks = function(cleaner) {
         };
     };
 };
+
+
+
+  ////////////////////////////
+ //       Validation       //
+////////////////////////////
+
+// Accepts a map of parameters representing the params `requested` of the route
+// and a map of params `expected`. `expected` is a map of expected keys to
+// validation functions (e.g. function(val){ return val%2 == 0; }).
+//
+// If a value is 'null', defaults to the isScalar function, or `fn` if
+// supplied. If a value is an array, checks that the corresponing request's
+// value is in that array.
+//
+// Returns true if the expectation is valid, otherwise false.
+//
+// e.g. request = { name: 'Jason', age: 22 },
+//      expects = { name: null, age: function(r){return r<25;}}
+//
+//      Will validate (return true).
+//
+var expects = function(request, expected, fn) {
+    if(!_.isFunction(fn)) fn = isScalar;
+    return _.every(expected, function(valid, key) {
+        if (!_.has(request, key)) return false;
+        if (_.isNull(valid)) return fn(request[key]);
+        if (_.isArray(valid)) return oneOfer(valid)(request[key]);
+        if (_.isFunction(valid)) return valid(request[key]);
+        return expects(request[key], valid);
+    });
+};
+exports.expects = expects;
+
+
+// Accepts a map of parameters representing the params `requested` of the route
+// and a map of params `allowed`. `allowed` is a map of allowed keys to
+// functions intended to validate their values.
+//
+// If a value is 'null', defaults to the isScalar function, or `fn` if
+// supplied. If a value is {} (the empty Object), all subparameters (nested
+// maps) are considered valid. If a value is an array, checks that the
+// corresponing request's value is in that array.
+//
+// Returns true if no more than the allowed params are in request, else false.
+//
+var allows = function(request, allowed, fn) {
+    if(!_.isFunction(fn)) fn = isScalar;
+    var extras = _.reject(request, function(val, key) {
+        var aval = allowed[key];
+        if (!_.has(allowed, key)) return false;
+        if (_.isNull(aval)) return fn(val);
+        if (_.isArray(aval)) return oneOfer(aval)(val);
+        if (_.isFunction(aval)) return aval(val);
+        if (_.isEmpty(aval)) return true;
+        return allows(val, aval);
+    });
+    return _.isEmpty(extras);
+};
+exports.allows = allows;
+
+
+// Convenience function combining allows and expected.
+//
+// Returns allows(request, allowed) && expects(request, expected)
+//
+var validates = function(request, allowed, expected) {
+    return expects(request, expected) && allows(request, allowed);
+};
+exports.validates = validates;
+
+
+var complement = function(fn) {
+    return function() {
+        return !fn.call(null, _.toArray(arguments));
+    };
+};
+exports.complement = complement;
+
+
+var isScalar = function(o) {
+    return !(_.isObject(o) || _.isArray(o) || _.isArguments(o));
+};
+
+
+var oneOfer = function(list) {
+    if(arguments.length > 1) list = _.toArray(arguments);
+    return function(el) {
+        return _.contains(list, el);
+    }
+};
+exports.oneOfer = oneOfer;

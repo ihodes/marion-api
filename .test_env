@@ -1,2 +1,3 @@
 MONGO_URL=mongodb://localhost/marionapitest
 PORT=4000
+ENVIRONMENT=development

@@ -38,3 +38,9 @@ exports.deleteSchedule = function(org, scheduleId, callback) {
         return schedule.remove(function(err) { callback(err, schedule); });
     });
 };
+
+
+var frequencies = exports.FREQUENCIES = ['sundays', 'mondays', 'tuesdays',
+                                         'wednesdays', 'thursdays',
+                                         'fridays', 'saturdays',
+                                         'daily', 'once'];

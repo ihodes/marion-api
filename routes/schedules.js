@@ -3,55 +3,48 @@
 'use strict';
 
 var Schedule = require('../models/schedule'),
-    utils    = require('../utils'),
+    U        = require('../utils'),
     _        = require('underscore');
 
 
 var DISPLAY_WHITELIST = ['_id', 'frequency', 'sendTime', 'active',
                          'person', 'protocol', 'createdAt'];
 
-var cleaner = utils.cleaner(DISPLAY_WHITELIST);
-var screen = utils.safeCallbacks(cleaner);
+var cleaner = U.cleaner(DISPLAY_WHITELIST);
+var screen = U.safeCallbacks(cleaner);
 
 exports.getSchedules = function (req, res) {
     Schedule.allSchedules(req.user, req.body,
-                          utils.sendBack(res, function(res) {
+                          U.sendBack(res, function(res) {
                               return { schedules: _.map(res, cleaner) };
                           }));
 };
 
 exports.createSchedule = function(req, res) {
-    var required   = ['person', 'protocol', 'sendTime', 'frequency'];
-    var addnl      = ['active'];
-    var missing    = _.difference(required, _.keys(req.body));
-    var extraneous = _.difference(_.keys(req.body), _.union(required, addnl));
-    var isValid    = _.isEmpty(missing) && _.isEmpty(extraneous);
-    if(!isValid)
-        return utils.error(res, utils.ERRORS.badRequest,
-                           { missingParams: missing,
-                             notAllowed: extraneous });
-
+    var expected = {person: null, protocol: null,
+                    sendTime: null, frequency: Schedule.FREQUENCIES };
+    var allowed = _.extend({ 'active': ['true', 'false'] }, expected);
+    if(!U.validates(req.body, allowed, expected))
+        return U.error(res, U.ERRORS.badRequest);
     return Schedule.createSchedule(req.user, req.body,
-                                   utils.sendBack(res, cleaner));
+                                   U.sendBack(res, cleaner));
 };
 
 exports.getSchedule = function(req, res) {
     Schedule.getSchedule(req.user, req.params.scheduleId,
-                         utils.sendBack(res));
+                         U.sendBack(res));
 };
 
 exports.updateSchedule = function(req, res) {
-    var allowed = ['active', 'sendTime', 'frequency'];
-    var extraneous = _.difference(_.keys(req.body), allowed);
-    if(!_.isEmpty(extraneous))
-        return utils.error(res, utils.ERRORS.badRequest,
-                           {notAllowed: extraneous});
-
+    console.log(req.body);
+    var valid = U.allows(req.body, {active: ['true', 'false'], sendTime: null,
+                                    frequency: Schedule.FREQUENCIES });
+    if(!valid) return U.error(res, U.ERRORS.badRequest);
     Schedule.updateSchedule(req.user, req.params.scheduleId,
-                            req.body, utils.sendBack(res, cleaner));
+                            req.body, U.sendBack(res, cleaner));
 };
 
 exports.deleteSchedule = function(req, res) {
     Schedule.deleteSchedule(req.user, req.params.scheduleId,
-                            utils.sendBack(res, cleaner));
+                            U.sendBack(res, cleaner));
 };
