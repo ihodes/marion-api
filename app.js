@@ -1,15 +1,21 @@
 'use strict';
 
-var express      = require('express'),
+var _            = require('underscore'),
+    express      = require('express'),
     config       = require('./config'),
-    Organization = require('./models/organization');
+    Organization = require('./models/organization'),
+    logging       = require('./logger');
 require('express-namespace');
+var logger = logging.logger;
 
 
 // App init
+logger.info('Starting application...');
+
 var app = express();
 app.use(express.bodyParser());
 app.use(express.basicAuth(Organization.authenticate));
+app.use(logging.requestLogger);
 
 
 // Routing
@@ -22,9 +28,8 @@ app.all('*', function (req, res) {
                           message: "Method does not exist."});
 });
 
-
 // App server setup
 app.listen(config.settings.PORT, function () {
-    console.log("Listening on port " + config.settings.PORT);
+    logger.info("Listening on port " + config.settings.PORT);
 });
 
