@@ -4,6 +4,17 @@ var _ = require('underscore');
 
 
 
+var TIME_REGEX = /^(0?\d|1\d|2[0123]):[012345]\d$/;
+
+
+var complement = function(fn) {
+    return function() {
+        return !fn.call(null, _.toArray(arguments));
+    };
+};
+exports.complement = complement;
+
+
   ////////////////////////////
  //       For Routes       //
 ////////////////////////////
@@ -67,42 +78,13 @@ var error = function(res, err, addnl) {
 }
 exports.error = error;
 
+
 // Returns a function which returns a "cleaned" resource object; 
 // only allowing through parameters which are on the whitelist. 
 // Nested objects are not "cleaned", only the first object is.
 exports.cleaner = function(whitelist) {
     return function(object) {
         return _.pick(object, whitelist);
-    };
-};
-
-
-
-// depreciated... (not used...)
-// Returns a function which creates callback functions that only allow the
-// params `cleaner` allows through. Useful for models.
-//
-// e.g. function callback(err, res) { console.log(res); };
-//      var cleaner = function(object) { return _.pick(object, WHITELIST); };
-//      safeCallbacks(cleaner)(callback)(error, {id: 123, private: "SECRET"})
-//      => /* prints */ {id: 123}
-exports.safeCallbacks = function(cleaner) {
-    return function(callback) {
-        return function(err, rawData, _etc) {
-            var result;
-            // Dispatch on type of raw data passed in
-            if(_.isArray(rawData)){
-                result = [];
-                for(var idx in rawData)
-                    result.push(cleaner(rawData[idx]));
-            } else if(_.isObject(rawData)) {
-                result = cleaner(rawData);
-            } else {
-                // Maybe should throw exception here...
-                result = rawData;
-            }
-            callback(err, result, _etc);
-        };
     };
 };
 
@@ -177,17 +159,16 @@ var validates = function(request, allowed, expected) {
 exports.validates = validates;
 
 
-var complement = function(fn) {
-    return function() {
-        return !fn.call(null, _.toArray(arguments));
-    };
-};
-exports.complement = complement;
-
-
 var isScalar = function(o) {
     return !(_.isObject(o) || _.isArray(o) || _.isArguments(o));
 };
+exports.isScalar = isScalar;
+
+
+var isTime = function(str) {
+    return TIME_REGEX.test(str);
+};
+exports.isTime = isTime;
 
 
 var oneOfer = function(list) {

@@ -6,5 +6,5 @@ while read p ; do export $p; done < .test_env
 mongo --eval "db.organizations.remove(); db.organizations.insert({name: \"test\", key: \"test-key\"})" marionapitest
 supervisor app.js &
 PID=$!
-sleep 2 && mocha
+sleep 2 && mocha --bail
 sleep 5 && kill $PID # ugh

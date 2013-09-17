@@ -2,16 +2,16 @@
 // Sept 2013
 'use strict';
 
-var Schedule = require('../models/schedule'),
+var _        = require('underscore'),
     U        = require('../utils'),
-    _        = require('underscore');
+    Schedule = require('../models/schedule');
 
 
 var DISPLAY_WHITELIST = ['_id', 'frequency', 'sendTime', 'active',
                          'person', 'protocol', 'createdAt'];
 
 var cleaner = U.cleaner(DISPLAY_WHITELIST);
-var screen = U.safeCallbacks(cleaner);
+
 
 exports.getSchedules = function (req, res) {
     Schedule.allSchedules(req.user, req.body,
@@ -22,7 +22,7 @@ exports.getSchedules = function (req, res) {
 
 exports.createSchedule = function(req, res) {
     var expected = {person: null, protocol: null,
-                    sendTime: null, frequency: Schedule.FREQUENCIES };
+                    sendTime: U.isTime, frequency: Schedule.FREQUENCIES };
     var allowed = _.extend({ 'active': ['true', 'false'] }, expected);
     if(!U.validates(req.body, allowed, expected))
         return U.error(res, U.ERRORS.badRequest);
@@ -37,7 +37,7 @@ exports.getSchedule = function(req, res) {
 
 exports.updateSchedule = function(req, res) {
     console.log(req.body);
-    var valid = U.allows(req.body, {active: ['true', 'false'], sendTime: null,
+    var valid = U.allows(req.body, {active: ['true', 'false'], sendTime: U.isTime,
                                     frequency: Schedule.FREQUENCIES });
     if(!valid) return U.error(res, U.ERRORS.badRequest);
     Schedule.updateSchedule(req.user, req.params.scheduleId,

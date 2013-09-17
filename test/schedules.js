@@ -10,7 +10,7 @@ var BASE = config.auth_url(config.SETTINGS.ORG_KEY);
 describe('Schedules', function() {
     var schedule = {
         frequency: 'daily',
-        sendTime: '12:00:00',
+        sendTime: '12:00',
         person: '52363f8cb591000000000001',
         protocol: '41224d776a326fb40f000001'
     }
