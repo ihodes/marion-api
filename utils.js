@@ -1,7 +1,6 @@
 'use strict';
 
-var _ = require('underscore');
-
+var _     = require('underscore');
 
 
 var TIME_REGEX = /^(0?\d|1\d|2[0123]):[012345]\d$/;
@@ -9,7 +8,7 @@ var TIME_REGEX = /^(0?\d|1\d|2[0123]):[012345]\d$/;
 
 var complement = function(fn) {
     return function() {
-        return !fn.call(null, _.toArray(arguments));
+        return !fn.apply(null, _.toArray(arguments));
     };
 };
 exports.complement = complement;
@@ -47,21 +46,17 @@ exports.sendBack = function(res, transform) {
     if(!transform) transform = _.identity;
     return function(err, results) {
         if (!results) return error(res, ERRORS.notFound);
+
+        // Because of silliness with the objects that Mongoose returns...
+        if (_.isArray(results)) results = _.map(results, getter('_doc'));
+        else results = results._doc;
+
         if (err) {
             console.log(err);
             return error(res, ERRORS.internalServerError);
         }
         return res.send(transform(results));
     }
-};
-
-
-// Validates (nested TK TODO) params of a request, ensuring all required 
-// params are present, and runs the callback if so. If not, 400 errors out.
-exports.validateParams = function(req, res, paramList, callback) {
-    if(_.every(paramList, _.partial(_.has, req.body)))
-        return callback(req, res);
-    else utils.error(res, ERRORS.badRequest);
 };
 
 
@@ -79,14 +74,25 @@ var error = function(res, err, addnl) {
 exports.error = error;
 
 
-// Returns a function which returns a "cleaned" resource object; 
+// Returns a function which returns a recursively "cleaned" resource object;
 // only allowing through parameters which are on the whitelist. 
-// Nested objects are not "cleaned", only the first object is.
-exports.cleaner = function(whitelist) {
+// 
+// `allowed` is an object mapping allowed keys to either null (for "allow")
+// or subdocuments which need to be cleaned as well.
+//
+var cleaner = function(allowed) {
     return function(object) {
-        return _.pick(object, whitelist);
+        var grabber = function(acc, val, key) {
+            if (!_.has(allowed, key))
+                return acc
+            if (_.isObject(allowed[key]))
+                return _.extend(acc, _.object([key], [cleaner(allowed[key])(val)]));
+            return _.extend(acc, _.object([key], [val]));
+        };
+        return _.reduce(object, grabber, {});
     };
 };
+exports.cleaner = cleaner;
 
 
 
@@ -159,6 +165,10 @@ var validates = function(request, allowed, expected) {
 exports.validates = validates;
 
 
+  /////////////////////////
+ // Validator functions //
+/////////////////////////
+
 var isScalar = function(o) {
     return !(_.isObject(o) || _.isArray(o) || _.isArguments(o));
 };
@@ -178,3 +188,13 @@ var oneOfer = function(list) {
     }
 };
 exports.oneOfer = oneOfer;
+
+
+// DEBUG fns
+var printer = function(o) {
+    console.log(o);
+    return o;
+}
+exports.printer = printer;
+
+var getter = function(key) { return function(o) { return o[key]; }};

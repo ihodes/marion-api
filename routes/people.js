@@ -7,7 +7,7 @@ var _      = require('underscore'),
     Person = require('../models/person');
 
 
-var DISPLAY_WHITELIST = ['_id', 'active', 'params'];
+var DISPLAY_WHITELIST = {_id: null, params: null, active: null};
 var cleaner = U.cleaner(DISPLAY_WHITELIST);
 
 
@@ -21,7 +21,8 @@ exports.getPeople = function (req, res) {
 };
 
 exports.createPerson = function(req, res) {
-    Person.createPerson(req.user, req.body, U.sendBack(res, cleaner));
+    Person.createPerson(req.user, req.body,
+                        U.sendBack(res, cleaner));
 };
 
 exports.getPerson = function(req, res) {

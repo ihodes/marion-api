@@ -4,11 +4,13 @@
 
 var _        = require('underscore'),
     U        = require('../utils'),
+    db       = require('../models/db'),
     Schedule = require('../models/schedule');
 
 
-var DISPLAY_WHITELIST = ['_id', 'frequency', 'sendTime', 'active',
-                         'person', 'protocol', 'createdAt'];
+var DISPLAY_WHITELIST = {'_id': null, 'frequency': null, 'sendTime': null,
+                         'active': null, 'person': null, 'protocol': null,
+                         'createdAt': null}
 
 var cleaner = U.cleaner(DISPLAY_WHITELIST);
 

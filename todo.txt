@@ -1,9 +1,0 @@
-# Validations
-*  Validate that ObjectIds passed in refer to a real, org-owned object
-*  Improve error messages that the API passes back to user (e.g. affected params)
-
-
-# Logging
-* Get/make/use Gleb's nice logging lib
-* Log ALL THE THINGS
-* implement loggly logging on production
