@@ -3,11 +3,11 @@
 'use strict';
 
 // Routes
-var people    = require('./people'),
-    schedules = require('./schedules'),
-    responses = require('./responses'),
-    protocols = require('./protocols'),
-    states    = require('./states');
+var people    = require('./controllers/people'),
+    schedules = require('./controllers/schedules'),
+    responses = require('./controllers/responses'),
+    protocols = require('./controllers/protocols'),
+    states    = require('./controllers/states');
 
 
 exports.routes = function(app) {

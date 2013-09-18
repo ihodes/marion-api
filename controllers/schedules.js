@@ -12,7 +12,6 @@ var _        = require('underscore'),
 var DISPLAY_WHITELIST = {'_id': null, 'frequency': null, 'sendTime': null,
                          'active': null, 'person': null, 'protocol': null,
                          'createdAt': null}
-
 var cleaner = U.cleaner(DISPLAY_WHITELIST);
 
 

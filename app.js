@@ -19,7 +19,7 @@ app.use(logging.requestLogger);
 
 
 // Routing
-var api = require('./routes/api');
+var api = require('./routes');
 
 app.namespace('/v1', api.routes(app));
 

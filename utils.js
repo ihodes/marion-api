@@ -97,7 +97,7 @@ exports.error = error;
 //
 // `allowed` is an object mapping allowed keys to either null (for "allow")
 // or subdocuments which need to be cleaned as well, or to functions which are
-// applied to the (key, value) to be returned and return an object to be merged
+// applied to the (value, key) to be returned and return an object to be merged
 // into the final object.
 //
 var cleaner = function(allowed) {
@@ -110,7 +110,7 @@ var cleaner = function(allowed) {
 
             if (_.isNull(allowed[key])) return _.extend(acc, o(key, val));
 
-            return _.extend(acc, allowed[key](key, val));
+            return _.extend(acc, allowed[key](val, key));
         };
         return _.reduce(object, grabber, {});
     };
@@ -122,8 +122,7 @@ exports.cleaner = cleaner;
   ////////////////////////////
  //       Validation       //
 ////////////////////////////
-//
-// `validate`
+// # Validate
 //
 // `validation(validation, requestBody)`
 //
@@ -140,10 +139,12 @@ exports.cleaner = cleaner;
 // [required::Boolean, validator::function]. An example `validation` map might
 // look like the follow.
 //
+// ```json
 // {name: [true, atLeastOfLength(5)],
 //  age: false,
 //  parents: [false, { mother: false, father: false }]
 //  ssn: [false, function(o) { return containsNDigits(9); }]}
+// ```
 //
 //
 // ## Validators (validation functions)
@@ -153,8 +154,10 @@ exports.cleaner = cleaner;
 //
 // As an alternative to providing a validation function, you can say with true
 // or false whether the key is required (above with `age`, `mother`, `father`):
-//
-//    key: required
+// 
+// ```json
+// { key: required::Boolean }
+// ```
 //
 // In addition to providing validation function, the second element in the tuple
 // may be another `validation` map, to which the rules above will be applied
@@ -169,46 +172,55 @@ exports.cleaner = cleaner;
 // the value being validated  will be tested for inclusion within.
 // For example, if a value must be either 'true' or 'false', you could use:
 //
-//    {key: [true, ['true', 'false']]}
+// ```json
+// { key: [true, ["true", "false"]] }
+// ```
 //
-// Which is equivalent to:
+// Which is functionally equivalent to:
 //
+// ```
 //    {key: [true, function(o) { return _.contains(['true', 'false'], o)}]}
-//
+// ```
 //
 // ## Errors
 //
 // The error object which is returned when validation fails will look like the
 // following:
 //
-// {errorKey: 'error message', ...}
+// ```
+// {errorKey: "error message", ...}
+// ```
 //
 // For example:
 //
-//    {name: 'name is required',
-//     ssn: 'ssn must have exactly 9 digits',
-//     parents: {sister: 'sister is not a valid parameter.'}}
+// ```
+// {name: "name is required",
+//  ssn: "ssn must have exactly 9 digits",
+//  parents: {sister: "sister is not a valid parameter."}}
+// ```
 //
-// Or, if parents had been a String instead of an Object:
+// Or, if the value of parents had been a string instead of an object:
 //
-//    { parents: 'parents must be an object.'}
+// ```
+// { parents: 'parents must be an object.'}
+// ```
 //
 // As you can see, the 'ssn' error is very informative. That is because of the way
 // validation function are defined. Validation function must return true if the
 // value is valid, else it must return a function which takes a key (the key being
 // validated), and returns a string which will be used as the error message.
 //
-// false may be used instead of a string, but then the error listed for the param
-// will be "{keyname} is not valid."
+// `false` may be used instead of a string, but then the default error message listed
+// for the param will be "{keyname} is not valid".
 //
-// If a key is required and is not provided, the error message is "{keyname} is
+// If a key is required and is not provided, the default error message is "{keyname} is
 // required".
 //
 // If a value is supposed to be found in an array (using the array shortcut notation
-// above), the error message is "{keyname} must be one of {*array}".
+// above), the default error message is "{keyname} must be one of {*array}".
 //
-// If there is a key in the requestBody that does not appear in the validation map,
-// it will result in error '{keyname} is not accepted'.
+// If there is a key in the `requestBody` that does not appear in the validation map,
+// it will result in default error message "{keyname} is not accepted".
 //
 var validates = function(validation, requestBody) {
     requestBody = deepClone(requestBody);
@@ -225,6 +237,7 @@ var validates = function(validation, requestBody) {
             return errors
         else if (required && !_.has(requestBody, key))
             return _.extend(errors, o(key, MISSING(key)));
+
         var requestVal = requestBody[key];
         delete requestBody[key];
 
