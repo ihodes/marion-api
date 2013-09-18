@@ -13,6 +13,15 @@ var complement = function(fn) {
 };
 exports.complement = complement;
 
+var deepClone = function(base) {
+    base = _.clone(base);
+    return _.reduce(base, function(cloned, val, key) {
+        if(_.isObject(val)) return _.extend(cloned, o(key, deepClone(val)));
+        else return _.extend(cloned, o(key, val));
+    }, {});
+};
+exports.deepClone = deepClone;
+
 var object = function(k,v) { return _.object([k], [v]); }
 var existy = function(v) { return !(v === undefined) && !(v === null); };
 var falsey = function(v) { return !existy(v) || (v === false); };
@@ -202,13 +211,7 @@ exports.cleaner = cleaner;
 // it will result in error '{keyname} is not accepted'.
 //
 var validates = function(validation, requestBody) {
-    var cloner = function(base) {
-        return _.reduce(base, function(cloned, val, key) {
-            if(_.isObject(val)) return _.extend(cloned, o(key, cloner(val)));
-            else return _.extend(cloned, o(key, _.clone(val)));
-        }, {});
-    }
-    requestBody = cloner(requestBody);
+    requestBody = deepClone(requestBody);
     var valitron2000 = function(errors, valid, key) {
         if (valid.length === 2) {
             var required = valid[0];
