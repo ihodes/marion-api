@@ -17,14 +17,14 @@ describe('People', function() {
     }
 
     describe('POST /v1/people...', function () {
-        it('Should respond 200 with person', 
+        it('Should respond 201 with person', 
            function(done) {
                var path = BASE + 'people';
                console.log('POST ', path, JSON.stringify(person));
 
                request.post(path, {form: person}, function(err, res, body) {
                    if(err) throw err;
-                   if(res.statusCode != 200) throw new Error('Status != 200');
+                   if(res.statusCode != 201) throw new Error('Status != 201');
                    // console.log('\nResponse: ', body, '\n\n');
 
                    var response = JSON.parse(body);

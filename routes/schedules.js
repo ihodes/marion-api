@@ -5,7 +5,8 @@
 var _        = require('underscore'),
     U        = require('../utils'),
     db       = require('../models/db'),
-    Schedule = require('../models/schedule');
+    Schedule = require('../models/schedule'),
+    logger = require('../logger').logger;
 
 
 var DISPLAY_WHITELIST = {'_id': null, 'frequency': null, 'sendTime': null,
@@ -23,25 +24,27 @@ exports.getSchedules = function (req, res) {
 };
 
 exports.createSchedule = function(req, res) {
-    var expected = {person: null, protocol: null,
-                    sendTime: U.isTime, frequency: Schedule.FREQUENCIES };
-    var allowed = _.extend({ 'active': ['true', 'false'] }, expected);
-    if(!U.validates(req.body, allowed, expected))
-        return U.error(res, U.ERRORS.badRequest);
+    var validation = {active: [false, ['true', 'false']], person: true,
+                      protocol: true, sendTime: U.isTime,
+                      frequency: [true, Schedule.FREQUENCIES]}
+    var errors = U.validates(validation, req.body);
+    if(_.isObject(errors))
+        return U.error(res, U.ERRORS.badRequest, {errors: errors});
     return Schedule.createSchedule(req.user, req.body,
-                                   U.sendBack(res, cleaner));
+                                   U.sendBack(res, cleaner, 201));
 };
 
 exports.getSchedule = function(req, res) {
-    Schedule.getSchedule(req.user, req.params.scheduleId,
-                         U.sendBack(res));
+    Schedule.getSchedule(req.user, req.params.scheduleId, U.sendBack(res, cleaner));
 };
 
 exports.updateSchedule = function(req, res) {
-    console.log(req.body);
-    var valid = U.allows(req.body, {active: ['true', 'false'], sendTime: U.isTime,
-                                    frequency: Schedule.FREQUENCIES });
-    if(!valid) return U.error(res, U.ERRORS.badRequest);
+    var validation = {active: [false, ['true', 'false']],
+                      sendTime: [false, U.isTime],
+                      frequency: [false, Schedule.FREQUENCIES]}
+    var errors = U.validates(validation, req.body);
+    if(_.isObject(errors))
+        return U.error(res, U.ERRORS.badRequest, {errors: errors});
     Schedule.updateSchedule(req.user, req.params.scheduleId,
                             req.body, U.sendBack(res, cleaner));
 };

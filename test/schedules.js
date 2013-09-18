@@ -16,14 +16,14 @@ describe('Schedules', function() {
     }
 
     describe('POST /v1/schedules...', function () {
-        it('Should respond 200 with schedule',
+        it('Should respond 201 with schedule',
            function(done) {
                var path = BASE + 'schedules';
                console.log('POST ', path, JSON.stringify(schedule));
 
                request.post(path, {form: schedule}, function(err, res, body) {
                    if(err) throw err;
-                   if(res.statusCode != 200) throw new Error('Status != 200');
+                   if(res.statusCode != 201) throw new Error('Status != 201');
                    // console.log('\nResponse: ', body, '\n\n');
 
                    var response = JSON.parse(body);
