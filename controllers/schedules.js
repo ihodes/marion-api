@@ -16,10 +16,9 @@ var cleaner = U.cleaner(DISPLAY_WHITELIST);
 
 
 exports.getSchedules = function (req, res) {
-    Schedule.allSchedules(req.user, req.body,
-                          U.sendBack(res, function(res) {
-                              return { schedules: _.map(res, cleaner) };
-                          }));
+    Schedule.allSchedules(req.user, U.sendBack(res, function(res) {
+        return { schedules: _.map(res, cleaner) };
+    }));
 };
 
 exports.createSchedule = function(req, res) {

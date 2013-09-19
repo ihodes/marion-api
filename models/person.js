@@ -26,6 +26,7 @@ exports.updatePerson = function(org, personId, params, callback) {
     db.Person.findOne(query, function(err, person) {
         if(!person) return callback(err, null);
         if(params.active) person.active = params.active;
+        // TK TODO -- implement properly (or use .update instead)
         for(var key in params.params) {
             person.params[key] = params.params[key];
             person.markModified('params.'+key);

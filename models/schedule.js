@@ -8,7 +8,7 @@ var _      = require('underscore'),
     utils  = require('../utils');
 
 
-exports.allSchedules = function(org, params, callback) {
+exports.allSchedules = function(org, callback) {
     db.Schedule.find({ organization: org }, callback);
 };
 
@@ -26,6 +26,7 @@ exports.updateSchedule = function(org, scheduleId, params, callback) {
     var query = { _id: scheduleId, organization: org };
     db.Schedule.findOne(query, function(err, schedule) {
         if(!schedule) return callback(err, null);
+        // TK TODO -- implement properly (or use .update instead)
         for(var key in params)
             schedule[key] = params[key];
         schedule.save(callback);

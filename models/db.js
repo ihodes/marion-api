@@ -56,10 +56,6 @@ var personSchema = new mongoose.Schema({
     active: {type: Boolean, default: true},
     createdAt: {type: Date, default: Date.now}
 });
-// personSchema.post("save", function(person) {
-//     // Test if Person is new, then note that, too.
-//     console.log(person.organization.name," saved Person(",person._id,")");
-// });
 exports.Person = mongoose.model('person', personSchema);
 
 
@@ -84,3 +80,22 @@ var organizationSchema = new mongoose.Schema({
     timezone: {type: String, default: 'UTC'}
 });
 exports.Organization = mongoose.model('organization', organizationSchema);
+
+
+var protocolSchema = new mongoose.Schema({
+    organization: {type: ObjectId, required: true, ref: 'organization'},
+    initialState: {type: ObjectId, required: false, ref: 'state'},
+    name: {type: String, required: true},
+    description: {type: String, required: false},
+});
+exports.Protocol = mongoose.model('protocol', protocolSchema);
+
+
+var stateSchema = new mongoose.Schema({
+    organization: {type: ObjectId, required: true, ref: 'organization'},
+    protocol: {type: ObjectId, required: true, ref: 'protocol'},
+    messages: {type: Object, required: false},
+    transition: {type: Object, required: false},
+    isTerminal: {type: Boolean, default: false}
+});
+exports.State = mongoose.model('state', stateSchema);
