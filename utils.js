@@ -1,7 +1,7 @@
 'use strict';
 
-var _     = require('underscore');
-
+var _      = require('underscore'),
+    logger = require('./logger').logger;
 
 var TIME_REGEX = /^(0?\d|1\d|2[0123]):[012345]\d$/;
 
@@ -62,14 +62,17 @@ exports.ERRORS = ERRORS;
 exports.sendBack = function(res, transform, status) {
     if(!existy(transform)) transform = _.identity;
     return function(err, results) {
-        if (!results) return error(res, ERRORS.notFound);
+        if (!results) {
+            logger.error('No result returned: ' + err)
+            return error(res, ERRORS.notFound);
+        }
 
         // Because of silliness with the objects that Mongoose returns...
         if (_.isArray(results)) results = _.map(results, getter('_doc'));
         else results = results._doc;
 
         if (err) {
-            console.log(err);
+            logger.error('Error occured: ' + err);
             return error(res, ERRORS.internalServerError);
         }
         if(!existy(status)) status = 200;

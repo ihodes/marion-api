@@ -50,8 +50,7 @@ describe('Protocols', function() {
 
                    var response = JSON.parse(body);
                    response.protocols.should.not.be.empty;
-                   response.protocols[0].name.should.equal(protocol.name);
-                   response.protocols[0].description.should.equal(protocol.description);
+                   should.exist(response.protocols[0].name);
 
                    done()
                });
@@ -76,7 +75,7 @@ describe('Protocols', function() {
                    should.exist(response.initialState);
                    response.initialState.should.equal(protocol.initialState);
 
-                   done()
+                   done();
                });
            });
     });

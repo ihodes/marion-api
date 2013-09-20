@@ -1,10 +1,35 @@
 #! /usr/bin/env bash
 
-# hacky as fuuuuuuuuu 
+# hacky as fuuuuuuuuu... need to take care of these "sleeps"
 
+DB=marionapitest
+TEST_API_KEY=test-key
+
+# Setup test environment
 while read p ; do export $p; done < .test_env
-mongo --eval "db.organizations.remove(); db.organizations.insert({name: \"test\", key: \"test-key\"})" marionapitest
+
+mongo $DB mocks.js > /dev/null 2>&1
+
 supervisor app.js &
-PID=$!
-sleep 1 && mocha --bail
-sleep 3 && kill $PID # ugh
+APP_PID=$!
+
+# dirty startup time hack
+sleep 1 && mocha --bail --check-leaks
+MOCHA_PID=$!
+
+kill -0 $MOCHA_PID
+READY=$?
+
+
+#### # Doesn't work... why? I don't know.
+#### while [  $READY -eq 0  ]
+#### do
+####     kill -0 $MOCHA_PID
+####     READY=$?
+#### done
+#### kill $APP_PID
+
+# In the meantime... hack
+sleep 2 && kill $APP_PID
+
+mongo --eval "db.dropDatabase()" $DB > /dev/null 2>&1

@@ -66,10 +66,10 @@ describe('People', function() {
 
                    var response = JSON.parse(body);
                    response.people.should.not.be.empty;
-                   response.people[0].params.name.should.equal(person.params.name);
-                   response.people[0].params.number.should.equal(person.params.number);
+                   should.exist(response.people[0].params.name);
+                   should.exist(response.people[0].params.number);
 
-                   done()
+                   done();
                });
            });
     });

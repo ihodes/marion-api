@@ -2,26 +2,46 @@
 // Sept 2013
 'use strict';
 
-// mock for now
-var success = function (msg) { return { success: msg }; };
+var _      = require('underscore'),
+    U      = require('../utils'),
+    State  = require('../models/state'),
+    logger = require('../logger').logger;
+
+
+var DISPLAY_WHITELIST = {_id: null, protocol: null,
+                         messages: {}, transition: {}};
+var cleaner = U.cleaner(DISPLAY_WHITELIST);
+
 
 exports.getStates = function (req, res) {
-    res.send(success('getStates'));
-}
+    State.allStates(req.user, req.params.protocolId, U.sendBack(res, function(res) {
+        return { states: _.map(res, cleaner) };
+    }));
+};
 
-exports.createState = function (req, res) {
-    res.send(success('createState'));
-}
+exports.createState = function(req, res) {
+    var validation = { messages: false, transition: [false, {}]};
+    var errors = U.validates(validation, req.body);
+    if(_.isObject(errors))
+        return U.error(res, U.ERRORS.badRequest, {errors: errors});
+    return State.createState(req.user, req.params.protocolId, req.body,
+                             U.sendBack(res, cleaner, 201));
+};
 
-exports.getState = function (req, res) {
-    res.send(success('getState ' + req.params.stateid));
-}
+exports.getState = function(req, res) {
+    State.getState(req.user, req.params.stateId, U.sendBack(res, cleaner));
+};
 
-exports.updateState = function (req, res) {
-    res.send(success('updateState ' + req.params.stateid));
-}
+exports.updateState = function(req, res) {
+    var validation = {messages: [false, {}], transition: [false, {}]};
+    var errors = U.validates(validation, req.body);
+    if(_.isObject(errors))
+        return U.error(res, U.ERRORS.badRequest, {errors: errors});
+    State.updateState(req.user, req.params.stateId, req.body,
+                      U.sendBack(res, cleaner));
+};
 
-exports.deleteState = function (req, res) {
-    res.send(success('deleteState ' + req.params.stateid));
-}
-
+exports.deleteState = function(req, res) {
+    State.deleteState(req.user, req.params.stateId,
+                            U.sendBack(res, cleaner));
+};

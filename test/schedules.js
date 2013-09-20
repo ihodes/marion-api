@@ -51,10 +51,10 @@ describe('Schedules', function() {
 
                    var response = JSON.parse(body);
                    response.schedules.should.not.be.empty;
-                   response.schedules[0].frequency.should.equal(schedule.frequency);
-                   response.schedules[0].sendTime.should.equal(schedule.sendTime);
+                   should.exist(response.schedules[0].sendTime);
+                   should.exist(response.schedules[0].frequency);
 
-                   done()
+                   done();
                });
            });
     });
