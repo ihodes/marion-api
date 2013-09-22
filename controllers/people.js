@@ -3,17 +3,18 @@
 'use strict';
 
 var _      = require('underscore'),
+    loch   = require('loch'),
     U      = require('../utils'),
     Person = require('../models/person'),
     logger = require('../logger').logger;
 
 
 var DISPLAY_WHITELIST = {_id: null, params: null, active: null};
-var cleaner = U.cleaner(DISPLAY_WHITELIST);
+var cleaner = loch.allower(DISPLAY_WHITELIST);
 
 
 exports.getPeople = function (req, res) {
-    var errors = U.validates({params: [false, {}], active: false}, req.body);
+    var errors = loch.validates({params: [false, {}], active: false}, req.body);
     if(_.isObject(errors))
        return U.error(res, U.ERRORS.badRequest, {errors: errors});
     Person.allPeople(req.user, U.sendBack(res, function(res) {
@@ -31,7 +32,7 @@ exports.getPerson = function(req, res) {
 };
 
 exports.updatePerson = function(req, res) {
-    var errors = U.validates({params: [false, {}], active: [false, ['true', 'false']]},
+    var errors = loch.validates({params: [false, {}], active: [false, ['true', 'false']]},
                              req.body);
     if(_.isObject(errors))
        return U.error(res, U.ERRORS.badRequest, {errors: errors});

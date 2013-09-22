@@ -3,6 +3,7 @@
 'use strict';
 
 var _      = require('underscore'),
+    loch   = require('loch'),
     U      = require('../utils'),
     State  = require('../models/state'),
     logger = require('../logger').logger;
@@ -10,7 +11,7 @@ var _      = require('underscore'),
 
 var DISPLAY_WHITELIST = {_id: null, protocol: null,
                          messages: {}, transition: {}};
-var cleaner = U.cleaner(DISPLAY_WHITELIST);
+var cleaner = loch.allower(DISPLAY_WHITELIST);
 
 
 exports.getStates = function (req, res) {
@@ -21,7 +22,7 @@ exports.getStates = function (req, res) {
 
 exports.createState = function(req, res) {
     var validation = { messages: false, transition: [false, {}]};
-    var errors = U.validates(validation, req.body);
+    var errors = loch.validates(validation, req.body);
     if(_.isObject(errors))
         return U.error(res, U.ERRORS.badRequest, {errors: errors});
     return State.createState(req.user, req.params.protocolId, req.body,
@@ -34,7 +35,7 @@ exports.getState = function(req, res) {
 
 exports.updateState = function(req, res) {
     var validation = {messages: [false, {}], transition: [false, {}]};
-    var errors = U.validates(validation, req.body);
+    var errors = loch.validates(validation, req.body);
     if(_.isObject(errors))
         return U.error(res, U.ERRORS.badRequest, {errors: errors});
     State.updateState(req.user, req.params.stateId, req.body,

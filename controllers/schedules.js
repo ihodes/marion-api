@@ -3,6 +3,7 @@
 'use strict';
 
 var _        = require('underscore'),
+    loch   = require('loch'),
     U        = require('../utils'),
     db       = require('../models/db'),
     Schedule = require('../models/schedule'),
@@ -12,7 +13,7 @@ var _        = require('underscore'),
 var DISPLAY_WHITELIST = {'_id': null, 'frequency': null, 'sendTime': null,
                          'active': null, 'person': null, 'protocol': null,
                          'createdAt': null}
-var cleaner = U.cleaner(DISPLAY_WHITELIST);
+var cleaner = loch.allower(DISPLAY_WHITELIST);
 
 
 exports.getSchedules = function (req, res) {
@@ -25,7 +26,7 @@ exports.createSchedule = function(req, res) {
     var validation = {active: [false, ['true', 'false']], person: true,
                       protocol: true, sendTime: U.isTime,
                       frequency: [true, Schedule.FREQUENCIES]}
-    var errors = U.validates(validation, req.body);
+    var errors = loch.validates(validation, req.body);
     if(_.isObject(errors))
         return U.error(res, U.ERRORS.badRequest, {errors: errors});
     return Schedule.createSchedule(req.user, req.body,
@@ -40,7 +41,7 @@ exports.updateSchedule = function(req, res) {
     var validation = {active: [false, ['true', 'false']],
                       sendTime: [false, U.isTime],
                       frequency: [false, Schedule.FREQUENCIES]}
-    var errors = U.validates(validation, req.body);
+    var errors = loch.validates(validation, req.body);
     if(_.isObject(errors))
         return U.error(res, U.ERRORS.badRequest, {errors: errors});
     Schedule.updateSchedule(req.user, req.params.scheduleId,

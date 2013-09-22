@@ -3,6 +3,7 @@
 'use strict';
 
 var _        = require('underscore'),
+    loch   = require('loch'),
     U        = require('../utils'),
     db       = require('../models/db'),
     Protocol = require('../models/protocol'),
@@ -11,7 +12,7 @@ var _        = require('underscore'),
 
 var DISPLAY_WHITELIST = {_id: null, initialState: null,
                          name: null, description: null}
-var cleaner = U.cleaner(DISPLAY_WHITELIST);
+var cleaner = loch.allower(DISPLAY_WHITELIST);
 
 
 exports.getProtocols = function (req, res) {
@@ -22,7 +23,7 @@ exports.getProtocols = function (req, res) {
 
 exports.createProtocol = function(req, res) {
     var validation = {initialState: false, name: true, description: true};
-    var errors = U.validates(validation, req.body);
+    var errors = loch.validates(validation, req.body);
     if(_.isObject(errors))
         return U.error(res, U.ERRORS.badRequest, {errors: errors});
     return Protocol.createProtocol(req.user, req.body,
@@ -35,7 +36,7 @@ exports.getProtocol = function(req, res) {
 
 exports.updateProtocol = function(req, res) {
     var validation = {initialState: false, name: false, description: false};
-    var errors = U.validates(validation, req.body);
+    var errors = loch.validates(validation, req.body);
     if(_.isObject(errors))
         return U.error(res, U.ERRORS.badRequest, {errors: errors});
     Protocol.updateProtocol(req.user, req.params.protocolId,
