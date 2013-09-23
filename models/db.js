@@ -99,3 +99,24 @@ var stateSchema = new mongoose.Schema({
     isTerminal: {type: Boolean, default: false}
 });
 exports.State = mongoose.model('state', stateSchema);
+
+
+var responseSchema = new mongoose.Schema({
+    organization: {type: ObjectId, required: true, ref: 'organization'},
+    protocolInstance: {type: ObjectId, required: true, ref: 'protocolInstance'},
+    state: {type: ObjectId, required: false, ref: 'state'},
+    completedAt: {type: Date, required: false},
+    createdAt: {type: Date, default: Date.now},
+    responseText: {type: String, required: false}
+});
+exports.Response = mongoose.model('response', responseSchema);
+
+
+var protocolInstanceSchema = new mongoose.Schema({
+    organization: {type: ObjectId, required: true, ref: 'organization'},
+    protocol: {type: ObjectId, required: true, ref: 'protocol'},
+    schedule: {type: ObjectId, required: false, ref: 'schedule'},
+    completedAt: {type: Date, required: false},
+    createdAt: {type: Date, default: Date.now},
+});
+exports.protocolInstance = mongoose.model('protocolInstance', protocolInstanceSchema);

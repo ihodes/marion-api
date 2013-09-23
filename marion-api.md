@@ -43,10 +43,12 @@ Responses represent a Person's response to a given Protocol.
 
     id                    ::  id
     person                ::  id, references Person
-    protocol              ::  id, references Protocol
-    intent                ::  string
-    completed_at          ::  datetime
-    messages_exchanged    ::  {string:string}
+    state                 ::  id, references State
+    protocolInstance      ::  id, references ProtocolInstance
+    intent                ::  string (TBI)
+    completedAt           ::  datetime
+    createdAt             ::  datetime
+    messagesExchanged     ::  {string:string} (currently responseText::String, TBI)
     
     
 ### The Protocol Object
