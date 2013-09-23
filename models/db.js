@@ -119,4 +119,4 @@ var protocolInstanceSchema = new mongoose.Schema({
     completedAt: {type: Date, required: false},
     createdAt: {type: Date, default: Date.now},
 });
-exports.protocolInstance = mongoose.model('protocolInstance', protocolInstanceSchema);
+exports.ProtocolInstance = mongoose.model('protocolInstance', protocolInstanceSchema);
