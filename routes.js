@@ -3,11 +3,12 @@
 'use strict';
 
 // Routes
-var people    = require('./controllers/people'),
-    schedules = require('./controllers/schedules'),
-    responses = require('./controllers/responses'),
-    protocols = require('./controllers/protocols'),
-    states    = require('./controllers/states');
+var people            = require('./controllers/people'),
+    schedules         = require('./controllers/schedules'),
+    responses         = require('./controllers/responses'),
+    protocols         = require('./controllers/protocols'),
+    protocolInstances = require('./controllers/protocolInstances'),
+    states            = require('./controllers/states');
 
 
 exports.routes = function(app) {
@@ -44,10 +45,10 @@ exports.routes = function(app) {
             app.delete('/state/:stateId', states.deleteState);
         });
 
-        app.get('/protocolinstances', protocalInstances.getProtocolInstances);
-        app.post('/protocolinstances', protocalInstances.createProtocolInstance);
-        app.get('/protocolinstance/:protocolid', protocalInstances.getProtocolInstance);
-        app.post('/protocolinstance/:protocolid', protocalInstances.updateProtocolInstance);
-        app.delete('/protocolinstance/:protocolpid', protocalInstances.deleteProtocolInstance);
+        app.get('/protocolInstances', protocolInstances.getProtocolInstances);
+        app.post('/protocolInstances', protocolInstances.createProtocolInstance);
+        app.get('/protocolInstance/:protocolInstanceId', protocolInstances.getProtocolInstance);
+        app.post('/protocolInstance/:protocolInstanceId', protocolInstances.updateProtocolInstance);
+        app.delete('/protocolInstance/:protocolInstanceId', protocolInstances.deleteProtocolInstance);
     };
 };
