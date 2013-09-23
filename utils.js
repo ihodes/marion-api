@@ -26,17 +26,18 @@ _.extend(exports, {object: object, existy: existy, falsey: falsey, truthy: truth
 ////////////////////////////
 
 var ERRORS = {
-    badRequest:    {status: 400, error: "Bad Request",
-                    message: "Missing or bad parameter(s)."},
-    unauthorized:  {status: 401, error: "Unauthorized",
-                    message: "Missing API Key."},
-    requestFailed: {status: 402, error: "Request Failed",
-                    message: "Parameters valid, but request failed."},
-    notFound:      {status: 404, error: "Not Found",
-                    message: "Resource does not exist."},
-    // 500s
-    internalServerError:      {status: 500, error: "Internal Server Error",
-                               message: "There has been an error."}
+    badRequest:          {status: 400, error: "Bad Request",
+                          message: "Missing or bad parameter(s)."},
+    unauthorized:        {status: 401, error: "Unauthorized",
+                          message: "Missing API Key."},
+    requestFailed:       {status: 402, error: "Request Failed",
+                          message: "Parameters valid, but request failed."},
+    notFound:            {status: 404, error: "Not Found",
+                          message: "Resource does not exist."},
+    methodNotAllowed:    {status: 405, error: "Method Not Allowed",
+                          message: "Method not allowed for resource."},
+    internalServerError: {status: 500, error: "Internal Server Error",
+                          message: "There has been an error."}
 }
 exports.ERRORS = ERRORS;
 
