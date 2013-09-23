@@ -9,20 +9,18 @@ var _      = require('underscore'),
     logger = require('../logger').logger;
 
 
-var DISPLAY_WHITELIST = {_id: null, params: null, active: null};
-var cleaner = loch.allower(DISPLAY_WHITELIST);
-
+var cleaner = loch.allower({_id: null, params: null, active: null});
 
 exports.getPeople = function (req, res) {
-    var errors = loch.validates({params: [false, {}], active: false}, req.body);
-    if(_.isObject(errors))
-       return U.error(res, U.ERRORS.badRequest, {errors: errors});
     Person.allPeople(req.user, U.sendBack(res, function(res) {
         return { people: _.map(res, cleaner) };
     }));
 };
 
 exports.createPerson = function(req, res) {
+    var errors = loch.validates({params: [false, {}], active: false}, req.body);
+    if(_.isObject(errors))
+        return U.error(res, U.ERRORS.badRequest, {errors: errors});
     Person.createPerson(req.user, req.body,
                         U.sendBack(res, cleaner, 201));
 };

@@ -4,12 +4,14 @@ var winston = require('winston'),
     _       = require('underscore');
 
 
-var consoleopts = { colorize: true, timestamp: true, handleExceptions: true };
+var consoleopts = { colorize: true, timestamp: true,
+                    handleExceptions: true, level: 'error' };
+// TK TODO wtf is up with levels here? (this works, but no idea why).
 var levels = {
     levels: {
-        debug: 4,
-        request: 3,
-        info: 2,
+        debug: 5,
+        request: 4,
+        info: 3,
         warn: 1,
         error: 0
     },

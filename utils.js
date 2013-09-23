@@ -55,7 +55,7 @@ exports.sendBack = function(res, transform, status) {
     if(!existy(transform)) transform = _.identity;
     return function(err, results) {
         if (!results) {
-            logger.error('No result returned: ' + err)
+            logger.warn('[utils::sendBack] 404 No result returned: (' + err + ')')
             return error(res, ERRORS.notFound);
         }
 
@@ -64,7 +64,7 @@ exports.sendBack = function(res, transform, status) {
         else results = results._doc;
 
         if (err) {
-            logger.error('Error occured: ' + err);
+            logger.error('[utils::sendBack] Internal 500 error occured: ' + err);
             return error(res, ERRORS.internalServerError);
         }
         if(!existy(status)) status = 200;
