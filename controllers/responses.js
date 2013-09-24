@@ -11,9 +11,9 @@ var _        = require('underscore'),
 
 
 var DISPLAY_WHITELIST = {_id: U._idToId, person: null, state: null,
-                         protocolInstance: null,
+                         protocolInstance: null, messageName: null,
                          intent: null, createdAt: null,
-                         responseText: null, completedAt: null}
+                         text: null, completedAt: null}
 var cleaner = loch.allower(DISPLAY_WHITELIST);
 
 
@@ -24,8 +24,8 @@ exports.getResponses = function (req, res) {
 }
 
 exports.createResponse = function (req, res) {
-    var validation = {state: true, protocolInstance: true, completedAt: false,
-                      responseText: false};
+    var validation = { state: true, protocolInstance: true, completedAt: false,
+                       text: false, messageName: false };
     var errors = loch.validates(validation, req.body);
     if(_.isObject(errors))
         return U.error(res, U.ERRORS.badRequest, {errors: errors});
@@ -37,11 +37,12 @@ exports.getResponse = function (req, res) {
 }
 
 exports.updateResponse = function (req, res) {
-    var validation = {completedAt: false, responseText: false};
+    var validation = { completedAt: false, responseText: false, messageName: false };
     var errors = loch.validates(validation, req.body);
     if(_.isObject(errors))
         return U.error(res, U.ERRORS.badRequest, {errors: errors});
-    Response.updateResponse(req.user, req.params.responseId, req.body, U.sendBack(res, cleaner));
+    Response.updateResponse(req.user, req.params.responseId, req.body,
+                            U.sendBack(res, cleaner));
 }
 
 exports.deleteResponse = function (req, res) {

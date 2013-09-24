@@ -11,20 +11,20 @@ var _                = require('underscore'),
 
 
 var DISPLAY_WHITELIST = {_id: U._idToId, protocol: null, schedule: null,
-                         completedAt: null, createdAt: null}
+                         completedAt: null, createdAt: null, currentState: null}
 var cleaner = loch.allower(DISPLAY_WHITELIST);
 
 
 exports.getProtocolInstances = function (req, res) {
     ProtocolInstance.allProtocolInstances(req.user, U.sendBack(res, function(res) {
-        return {protocolInstances: _.map(res, cleaner) };
+        return { protocolInstances: _.map(res, cleaner) };
     }));
 }
 
 exports.createProtocolInstance = function (req, res) {
-    var validation = {protocol: true, schedule: true};
+    var validation = {protocol: true, schedule: true, currentState: true, completedAt: false};
     var errors = loch.validates(validation, req.body);
-    if(_.isObject(errors))
+    if (_.isObject(errors))
         return U.error(res, U.ERRORS.badRequest, {errors: errors});
     return ProtocolInstance.createProtocolInstance(req.user, req.body,
                                                    U.sendBack(res, cleaner, 201));
@@ -36,7 +36,12 @@ exports.getProtocolInstance = function (req, res) {
 }
 
 exports.updateProtocolInstance = function (req, res) {
-    return U.error(res, U.ERRORS.methodNotAllowed);
+    var validation = { currentState: false, completedAt: false };
+    var errors = loch.validates(validation, req.body);
+    if (_.isObject(errors))
+        return U.error(res, U.ERRORS.badRequest, {errors: errors});
+    ProtocolInstance.updateProtocolInstance(req.user, req.params.protocolInstanceId, req.body,
+                                            U.sendBack(res, cleaner));
 }
 
 exports.deleteProtocolInstance = function (req, res) {

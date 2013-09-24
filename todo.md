@@ -1,5 +1,6 @@
 # Validations
 *   DEFER [need a clean way to do this asynchronously; may need promises to not have callback hell. Should try to offer a nice DSL for doing so, though, ideally through the expected/allows maps as other validations are done.] Validate that ObjectIds passed in refer to a real, org-owned object (or else 404)
+* Validate data types passed in...  e.g. protocolInstance.completedAt
 
 
 # Logging
@@ -19,6 +20,7 @@
 * Better mocks/test data
 * Test for all errors as well
 * Don't wrap (e.g. test/states.js) in a callback so we can use a protocol id to test with... it's ugly
+* All tests should refer to the Models loch validation map and make sure the response they recieve conforms (or something like that--so we're testing the API spec from the model; we shouldn't have to update it in both places. dry yo. DRY fo' life.)
 
 
 # API
@@ -30,3 +32,5 @@
 # Processes
 * Webhooks for e.g. Twilio (how to generalize this?)
 * Scheduling daemon/queue mgmt/dispatch to Twilio etc
+
+

@@ -121,9 +121,9 @@ var responseSchema = new mongoose.Schema({
 
     protocolInstance: {type: ObjectId, required: true, ref: 'protocolInstance'},
 
-    state:    {type: ObjectId, required: false, ref: 'state'},
-    message:  {type: String, required: true},
-    text:     {type: String, required: false},
+    state:       {type: ObjectId, required: false, ref: 'state'},
+    messageName: {type: String, required: true},
+    text:        {type: String, required: false},
 });
 exports.Response = mongoose.model('response', responseSchema);
 

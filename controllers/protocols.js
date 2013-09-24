@@ -11,7 +11,7 @@ var _        = require('underscore'),
 
 
 var DISPLAY_WHITELIST = {_id: U._idToId, initialState: null,
-                         name: null, description: null}
+                         name: null, description: null, createdAt: null}
 var cleaner = loch.allower(DISPLAY_WHITELIST);
 
 
