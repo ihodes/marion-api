@@ -3,8 +3,6 @@
 
 
 # Logging
-* Fix logger.error etc not showing up in console
-* Log to loggly on PRODUCTION
 * Log ALL THE THINGS
   * When things are created. (would be nice if you could hook into Mongoose for this)
   * Errors. ALL OF THE ERRORS.
@@ -21,3 +19,14 @@
 * Better mocks/test data
 * Test for all errors as well
 * Don't wrap (e.g. test/states.js) in a callback so we can use a protocol id to test with... it's ugly
+
+
+# API
+* Correctly allow/require and insert/update all spec'd parameters
+* Support 'expanding' subdocuments (e.g. an ObjectId would expand into the actual object)
+* Cascading deletes
+
+
+# Processes
+* Webhooks for e.g. Twilio (how to generalize this?)
+* Scheduling daemon/queue mgmt/dispatch to Twilio etc

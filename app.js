@@ -21,6 +21,10 @@ app.use(logging.requestLogger);
 // Routing
 var api = require('./routes');
 
+app.all('v1', function(req, res) {
+    res.send({message: "You are connected to the API", status: 200});
+});
+
 app.namespace('/v1', api.routes(app));
 
 app.all('*', function (req, res) {

@@ -1,8 +1,9 @@
 'use strict';
 
-var winston = require('winston'),
-    _       = require('underscore');
-
+var winston  = require('winston'),
+    _        = require('underscore'),
+    SETTINGS = require('./config').settings;
+require('winston-loggly');
 
 var consoleopts = { colorize: true, timestamp: true,
                     handleExceptions: true, level: 'error' };
@@ -32,6 +33,12 @@ var logger = new winston.Logger({
         new winston.transports.Console(consoleopts)
     ]});
 exports.logger = logger;
+
+
+if (SETTINGS.ENVIRONMENT == 'PRODUCTION') {
+    var options = {level: 'error', subdomain: '', auth: ''};
+    winston.add(winston.transports.Loggly, options);
+}
 
 
 exports.requestLogger = function(req, res, next) {
