@@ -19,21 +19,19 @@ describe('Schedules', function() {
         it('Should respond 201 with schedule',
            function(done) {
                var path = BASE + 'schedules';
-               console.log('POST ', path, JSON.stringify(schedule));
 
                request.post(path, {form: schedule}, function(err, res, body) {
                    if(err) throw err;
                    if(res.statusCode != 201) throw new Error('Status != 201');
-                   // console.log('\nResponse: ', body, '\n\n');
 
                    var response = JSON.parse(body);
-                   should.exist(response._id);
-                   schedule._id = response._id;
+                   should.exist(response.id);
+                   schedule.id = response.id;
 
                    response.frequency.should.equal(schedule.frequency);
                    response.sendTime.should.equal(schedule.sendTime);
 
-                   done()
+                   done();
                });
            });
     });
@@ -42,12 +40,10 @@ describe('Schedules', function() {
         it('Should respond with schedules',
            function(done) {
                var path = BASE + 'schedules';
-               console.log('GET ', path);
 
                request.get(path, {}, function(err, res, body) {
                    if(err) throw err;
                    if(res.statusCode != 200) throw new Error('Status != 200');
-                   // console.log('\nResponse: ', body, '\n\n');
 
                    var response = JSON.parse(body);
                    response.schedules.should.not.be.empty;
@@ -62,23 +58,20 @@ describe('Schedules', function() {
     describe('POST /v1/schedule/:id...', function () {
         it('Should respond with updated schedule',
            function(done) {
-               var path = BASE + 'schedule/' + schedule._id;
+               var path = BASE + 'schedule/' + schedule.id;
                var params = { active: false, frequency: 'mondays'};
                schedule.active = params.active;
                schedule.frequency = params.frequency;
 
-               console.log('POST ', path, params);
-
                request.post(path, {form: params}, function(err, res, body) {
                    if(err) throw err;
                    if(res.statusCode != 200) throw new Error('Status != 200');
-                   // console.log('\nResponse: ', body, '\n\n');
 
                    var response = JSON.parse(body);
                    response.active.should.be.false;
                    response.frequency.should.equal(schedule.frequency);
 
-                   done()
+                   done();
                });
            });
     });
@@ -86,20 +79,18 @@ describe('Schedules', function() {
     describe('GET /v1/schedule/:id...', function () {
         it('Should respond with schedule',
            function(done) {
-               var path = BASE + 'schedule/' + schedule._id;
-               console.log('GET ', path);
+               var path = BASE + 'schedule/' + schedule.id;
 
                request.post(path, {}, function(err, res, body) {
                    if(err) throw err;
                    if(res.statusCode != 200) throw new Error('Status != 200');
-                   // console.log('\nResponse: ', body, '\n\n');
 
                    var response = JSON.parse(body);
                    response.active.should.be.false;
                    response.sendTime.should.equal(schedule.sendTime);
                    response.frequency.should.equal(schedule.frequency);
 
-                   done()
+                   done();
                });
            });
     });
@@ -107,20 +98,18 @@ describe('Schedules', function() {
     describe('DELETE /v1/schedule/:id...', function () {
         it('Should respond with schedule',
            function(done) {
-               var path = BASE + 'schedule/' + schedule._id;
-               console.log('DELETE ', path);
+               var path = BASE + 'schedule/' + schedule.id;
 
                request.del(path, function(err, res, body) {
                    if(err) throw err;
                    if(res.statusCode != 200) throw new Error('Status != 200');
-                   // console.log('\nResponse: ', body, '\n\n');
 
                    var response = JSON.parse(body);
                    response.active.should.be.false;
                    response.sendTime.should.equal(schedule.sendTime);
                    response.frequency.should.equal(schedule.frequency);
 
-                   done()
+                   done();
                });
            });
     });

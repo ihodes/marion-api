@@ -8,8 +8,8 @@ var request  = require('request'),
     logger   = require('../logger').logger;
 var BASE = config.auth_url(config.SETTINGS.ORG_KEY);
 
-
 var state = {};
+
 
 db.Protocol.findOne(function(err, protocol) {
     state.protocol = protocol._id;
@@ -21,20 +21,19 @@ describe('States', function() {
         it('Should respond 201 with state',
            function(done) {
                var path = BASE + 'states';
-               console.log('POST ', path);
+               var params = { messages: [{type: 'text', body: 'Hello. How are you?', destination: '$Person.params.cell_number', name: 'howYouIs'}] };
 
-               request.post(path, {form: {}}, function(err, res, body) {
+               request.post(path, {form: params}, function(err, res, body) {
                    if(err) throw err;
                    if(res.statusCode != 201) throw new Error('Status != 201 (is '+res.statusCode+')');
-                   // console.log('\nResponse: ', body, '\n\n');
 
                    var response = JSON.parse(body);
-                   should.exist(response._id);
-                   state._id = response._id;
+                   should.exist(response.id);
+                   state.id = response.id;
 
                    should.exist(response.protocol);
 
-                   done()
+                   done();
                });
            });
     });
@@ -43,18 +42,16 @@ describe('States', function() {
         it('Should respond with states',
            function(done) {
                var path = BASE + 'states';
-               console.log('GET ', path);
 
                request.get(path, {}, function(err, res, body) {
                    if(err) throw err;
                    if(res.statusCode != 200) throw new Error('Status != 200 (is '+res.statusCode+')');
-                   // console.log('\nResponse: ', body, '\n\n');
 
                    var response = JSON.parse(body);
                    response.states.should.not.be.empty;
                    should.exist(response.states[0].protocol);
 
-                   done()
+                   done();
                });
            });
     });
@@ -62,20 +59,19 @@ describe('States', function() {
     describe('POST /v1/state/:id...', function () {
         it('Should respond with updated state',
            function(done) {
-               var path = BASE + 'state/' + state._id;
-               var params = { messages: {id:'523b244a948b0f75a1000001'} };
-
-               console.log('POST ', path, params);
+               var path = BASE + 'state/' + state.id;
+               var params = { messages: [{type:'text', body: 'You aight?',
+                                          destination: '$Person.params.cell',
+                                          name: 'okayness'}] };
 
                request.post(path, {form: params}, function(err, res, body) {
                    if(err) throw err;
                    if(res.statusCode != 200) throw new Error('Status != 200 (is '+res.statusCode+')');
-                   // console.log('\nResponse: ', body, '\n\n');
 
                    var response = JSON.parse(body);
                    should.exist(response.protocol);
 
-                   done()
+                   done();
                });
            });
     });
@@ -83,18 +79,16 @@ describe('States', function() {
     describe('GET /v1/state/:id...', function () {
         it('Should respond with state',
            function(done) {
-               var path = BASE + 'state/' + state._id;
-               console.log('GET ', path);
+               var path = BASE + 'state/' + state.id;
 
-               request.post(path, {}, function(err, res, body) {
+               request.get(path, {}, function(err, res, body) {
                    if(err) throw err;
                    if(res.statusCode != 200) throw new Error('Status != 200 (is '+res.statusCode+')');
-                   // console.log('\nResponse: ', body, '\n\n');
 
                    var response = JSON.parse(body);
                    should.exist(response.protocol);
 
-                   done()
+                   done();
                });
            });
     });
@@ -102,18 +96,15 @@ describe('States', function() {
     describe('DELETE /v1/state/:id...', function () {
         it('Should respond with state',
            function(done) {
-               var path = BASE + 'state/' + state._id;
-               console.log('DELETE ', path);
+               var path = BASE + 'state/' + state.id;
 
                request.del(path, function(err, res, body) {
                    if(err) throw err;
                    if(res.statusCode != 200) throw new Error('Status != 200 (is '+res.statusCode+')');
-                   // console.log('\nResponse: ', body, '\n\n');
-
                    var response = JSON.parse(body);
                    response.protocol.should.equal(String(state.protocol));
 
-                   done()
+                   done();
                });
            });
     });

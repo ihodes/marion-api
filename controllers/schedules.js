@@ -10,9 +10,9 @@ var _        = require('underscore'),
     logger = require('../logger').logger;
 
 
-var DISPLAY_WHITELIST = {'_id': null, 'frequency': null, 'sendTime': null,
-                         'active': null, 'person': null, 'protocol': null,
-                         'createdAt': null}
+var DISPLAY_WHITELIST = { _id: U._idToId, frequency: null, sendTime: null,
+                          active: null, person: null, protocol: null,
+                          createdAt: null }
 var cleaner = loch.allower(DISPLAY_WHITELIST);
 
 
@@ -24,7 +24,7 @@ exports.getSchedules = function (req, res) {
 
 exports.createSchedule = function(req, res) {
     var validation = {active: [false, ['true', 'false']], person: true,
-                      protocol: true, sendTime: U.isTime,
+                      protocol: true, sendTime: [true, U.isTime],
                       frequency: [true, Schedule.FREQUENCIES]}
     var errors = loch.validates(validation, req.body);
     if(_.isObject(errors))

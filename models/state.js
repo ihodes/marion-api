@@ -29,6 +29,7 @@ exports.updateState = function(org, stateId, params, callback) {
         // TK TODO -- implement properly (or use .update instead)
         for(var key in params)
             state[key] = params[key];
+        state.messages = params.messages;
         return state.save(callback);
     });
 };

@@ -14,12 +14,15 @@ var complement = function(fn) {
 exports.complement = complement;
 
 
-var object = function(k,v) { return _.object([k], [v]); }
-var existy = function(v) { return !(v === undefined) && !(v === null); };
-var falsey = function(v) { return !existy(v) || (v === false); };
-var truthy = function(v) { return !falsey(v); };
+var constantly = function(v) { return function() { return v; }; };
+var object     = function(k,v) { return _.object([k], [v]); }
+var existy     = function(v) { return !(v === undefined) && !(v === null); };
+var falsey     = function(v) { return !existy(v) || (v === false); };
+var truthy     = function(v) { return !falsey(v); };
 var o = object;
-_.extend(exports, {object: object, existy: existy, falsey: falsey, truthy: truthy});
+_.extend(exports, {object: object, existy: existy, falsey: falsey, truthy: truthy,
+                   constantly: constantly});
+
 
   ////////////////////////////
  //       For Routes       //
@@ -88,30 +91,6 @@ var error = function(res, err, addnl) {
 exports.error = error;
 
 
-  /////////////////////////
- // Validator functions //
-/////////////////////////
-
-var isScalar = function(o) {
-    return !(_.isObject(o) || _.isArray(o) || _.isArguments(o));
-};
-exports.isScalar = isScalar;
-
-
-var isTime = function(str) {
-    return TIME_REGEX.test(str);
-};
-exports.isTime = isTime;
-
-
-var oneOfer = function(list) {
-    if(arguments.length > 1) list = _.toArray(arguments);
-    return function(el) {
-        return _.contains(list, el);
-    }
-};
-exports.oneOfer = oneOfer;
-
 
 // DEBUG fns
 var printer = function(o) {
@@ -121,3 +100,9 @@ var printer = function(o) {
 exports.printer = printer;
 
 var getter = function(key) { return function(o) { return o[key]; }};
+
+
+// for display sanitation
+var _idToId = exports._idToId = function(id) {
+    return { id: id };
+};

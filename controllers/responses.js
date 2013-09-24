@@ -10,7 +10,7 @@ var _        = require('underscore'),
     logger   = require('../logger').logger;
 
 
-var DISPLAY_WHITELIST = {_id: null, person: null, state: null,
+var DISPLAY_WHITELIST = {_id: U._idToId, person: null, state: null,
                          protocolInstance: null,
                          intent: null, createdAt: null,
                          responseText: null, completedAt: null}

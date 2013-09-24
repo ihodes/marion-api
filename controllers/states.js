@@ -9,9 +9,16 @@ var _      = require('underscore'),
     logger = require('../logger').logger;
 
 
-var DISPLAY_WHITELIST = {_id: null, protocol: null,
-                         messages: {}, transition: {}};
+var DISPLAY_WHITELIST = {_id: U._idToId, protocol: null, isTerminal: null,
+                         messages: null, transitions: null};
 var cleaner = loch.allower(DISPLAY_WHITELIST);
+
+var validation = { messages:    [true, [{ type: false, body: false,
+                                          destination: true, name: false }]],
+                   transitions: [false, [{pending: [true, loch.isArrayOfScalars],
+                                          classifier: true,
+                                          toState: true}]],
+                   isTerminal:  [false, _.isBoolean] };
 
 
 exports.getStates = function (req, res) {
@@ -21,7 +28,6 @@ exports.getStates = function (req, res) {
 };
 
 exports.createState = function(req, res) {
-    var validation = { messages: false, transition: [false, {}]};
     var errors = loch.validates(validation, req.body);
     if(_.isObject(errors))
         return U.error(res, U.ERRORS.badRequest, {errors: errors});
@@ -34,7 +40,6 @@ exports.getState = function(req, res) {
 };
 
 exports.updateState = function(req, res) {
-    var validation = {messages: [false, {}], transition: [false, {}]};
     var errors = loch.validates(validation, req.body);
     if(_.isObject(errors))
         return U.error(res, U.ERRORS.badRequest, {errors: errors});

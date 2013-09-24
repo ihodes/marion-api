@@ -9,7 +9,7 @@ var _      = require('underscore'),
     logger = require('../logger').logger;
 
 
-var cleaner = loch.allower({_id: null, params: null, active: null});
+var cleaner = loch.allower({_id: U._idToId, params: null, active: null});
 
 exports.getPeople = function (req, res) {
     Person.allPeople(req.user, U.sendBack(res, function(res) {

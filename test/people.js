@@ -20,21 +20,19 @@ describe('People', function() {
         it('Should respond 201 with person', 
            function(done) {
                var path = BASE + 'people';
-               console.log('POST ', path, JSON.stringify(person));
 
                request.post(path, {form: person}, function(err, res, body) {
                    if(err) throw err;
                    if(res.statusCode != 201) throw new Error('Status != 201');
-                   // console.log('\nResponse: ', body, '\n\n');
 
                    var response = JSON.parse(body);
-                   should.exist(response._id);
-                   person._id = response._id; 
+                   should.exist(response.id);
+                   person.id = response.id; 
 
                    response.params.name.should.equal(person.params.name);
                    response.params.number.should.equal(person.params.number);
 
-                   done()
+                   done();
                });
            });
     });
@@ -43,12 +41,11 @@ describe('People', function() {
         it('Should respond with 401 unauthorized', 
            function(done) {
                var path = UNAUTH_BASE + 'people';
-               console.log('POST ', path, JSON.stringify(person));
 
                request.post(path, {form: person}, function(err, res, body) {
                    if(err) throw err;
                    if(res.statusCode != 401) throw new Error('Status != 401');
-                   done()
+                   done();
                });
            });
     });
@@ -57,12 +54,10 @@ describe('People', function() {
         it('Should respond with people', 
            function(done) {
                var path = BASE + 'people';
-               console.log('GET ', path);
 
                request.get(path, {}, function(err, res, body) {
                    if(err) throw err;
                    if(res.statusCode != 200) throw new Error('Status != 200');
-                   // console.log('\nResponse: ', body, '\n\n');
 
                    var response = JSON.parse(body);
                    response.people.should.not.be.empty;
@@ -77,25 +72,22 @@ describe('People', function() {
     describe('POST /v1/person/:id...', function () {
         it('Should respond with updated person', 
            function(done) {
-               var path = BASE + 'person/' + person._id;
+               var path = BASE + 'person/' + person.id;
                var params = { active: false, params: { age: 152, number: '+17776666666' }};
                person.active = params.active;
                person.params.age = params.params.age;
                person.params.number = params.params.number;
 
-               console.log('POST ', path, params);
-
                request.post(path, {form: params}, function(err, res, body) {
                    if(err) throw err;
                    if(res.statusCode != 200) throw new Error('Status != 200');
-                   // console.log('\nResponse: ', body, '\n\n');
 
                    var response = JSON.parse(body);
                    response.active.should.be.false;
                    response.params.name.should.equal(person.params.name);
                    response.params.number.should.equal(person.params.number);
 
-                   done()
+                   done();
                });
            });
     });
@@ -103,20 +95,18 @@ describe('People', function() {
     describe('GET /v1/person/:id...', function () {
         it('Should respond with person', 
            function(done) {
-               var path = BASE + 'person/' + person._id;
-               console.log('GET ', path);
+               var path = BASE + 'person/' + person.id;
 
                request.post(path, {}, function(err, res, body) {
                    if(err) throw err;
                    if(res.statusCode != 200) throw new Error('Status != 200');
-                   // console.log('\nResponse: ', body, '\n\n');
 
                    var response = JSON.parse(body);
                    response.active.should.be.false;
                    response.params.name.should.equal(person.params.name);
                    response.params.number.should.equal(person.params.number);
 
-                   done()
+                   done();
                });
            });
     });
@@ -125,12 +115,11 @@ describe('People', function() {
         it('Should respond with 404', 
            function(done) {
                var path = BASE + 'person/' + 'no-id-here';
-               console.log('GET ', path);
 
                request.post(path, {}, function(err, res, body) {
                    if(err) throw err;
                    if(res.statusCode != 404) throw new Error('Status != 200');
-                   done()
+                   done();
                });
            });
     });
@@ -138,21 +127,19 @@ describe('People', function() {
     describe('DELETE /v1/person/:id...', function () {
         it('Should respond with person', 
            function(done) {
-               var path = BASE + 'person/' + person._id;
+               var path = BASE + 'person/' + person.id;
                var params = {confirm: true};
-               console.log('DELETE ', path, params);
 
                request.del(path, {form: params}, function(err, res, body) {
                    if(err) throw err;
                    if(res.statusCode != 200) throw new Error('Status != 200');
-                   // console.log('\nResponse: ', body, '\n\n');
 
                    var response = JSON.parse(body);
                    response.active.should.be.false;
                    response.params.name.should.equal(person.params.name);
                    response.params.number.should.equal(person.params.number);
 
-                   done()
+                   done();
                });
            });
     });

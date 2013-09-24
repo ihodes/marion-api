@@ -10,7 +10,7 @@ var _        = require('underscore'),
     logger = require('../logger').logger;
 
 
-var DISPLAY_WHITELIST = {_id: null, initialState: null,
+var DISPLAY_WHITELIST = {_id: U._idToId, initialState: null,
                          name: null, description: null}
 var cleaner = loch.allower(DISPLAY_WHITELIST);
 

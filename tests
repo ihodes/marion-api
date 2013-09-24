@@ -14,7 +14,7 @@ supervisor app.js &
 APP_PID=$!
 
 # dirty startup time hack
-sleep 1 && mocha --bail --check-leaks
+sleep 1 && mocha --bail --check-leaks --reporter spec
 MOCHA_PID=$!
 
 kill -0 $MOCHA_PID
