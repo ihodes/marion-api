@@ -4,15 +4,23 @@
 
 var _                = require('underscore'),
     loch             = require('loch'),
-    U                = require('../utils'),
+    U                = require('../lib/utils'),
     db               = require('../models/db'),
     ProtocolInstance = require('../models/protocolInstance'),
-    logger           = require('../logger').logger;
+    logger           = require('../lib/logger').logger;
 
 
-var DISPLAY_WHITELIST = {_id: U._idToId, protocol: null, schedule: null,
-                         completedAt: null, createdAt: null, currentState: null}
-var cleaner = loch.allower(DISPLAY_WHITELIST);
+var API = {
+    publicFields: {_id: U._idToId, protocol: null, schedule: null,
+                   completedAt: null, createdAt: null,
+                   currentState: null},
+    createParams: {protocol: true, schedule: true,
+                   currentState: true, completedAt: false},
+    updateParams: {currentState: false, completedAt: false}
+};
+var cleaner = loch.allower(API.publicFields);
+var createValidator = _.partial(loch.validates, API.createParams);
+var updateValidator = _.partial(loch.validates, API.updateParams);
 
 
 exports.getProtocolInstances = function (req, res) {
@@ -22,12 +30,11 @@ exports.getProtocolInstances = function (req, res) {
 }
 
 exports.createProtocolInstance = function (req, res) {
-    var validation = {protocol: true, schedule: true, currentState: true, completedAt: false};
-    var errors = loch.validates(validation, req.body);
+    var errors = createValidator(req.body);
     if (_.isObject(errors))
         return U.error(res, U.ERRORS.badRequest, {errors: errors});
     return ProtocolInstance.createProtocolInstance(req.user, req.body,
-                                                   U.sendBack(res, cleaner, 201));
+                                                   U.sendBack(res, 201, cleaner));
 }
 
 exports.getProtocolInstance = function (req, res) {
@@ -36,8 +43,7 @@ exports.getProtocolInstance = function (req, res) {
 }
 
 exports.updateProtocolInstance = function (req, res) {
-    var validation = { currentState: false, completedAt: false };
-    var errors = loch.validates(validation, req.body);
+    var errors = updateValidator(req.body);
     if (_.isObject(errors))
         return U.error(res, U.ERRORS.badRequest, {errors: errors});
     ProtocolInstance.updateProtocolInstance(req.user, req.params.protocolInstanceId, req.body,

@@ -4,12 +4,20 @@
 
 var _      = require('underscore'),
     loch   = require('loch'),
-    U      = require('../utils'),
+    U      = require('../lib/utils'),
     Person = require('../models/person'),
-    logger = require('../logger').logger;
+    logger = require('../lib/logger').logger;
 
 
-var cleaner = loch.allower({_id: U._idToId, params: null, active: null});
+var API = {
+    publicFields: {_id: U._idToId, params: null, active: null},
+    createParams: {params: [false, {}], active: false},
+    updateParams: {params: [false, {}], active: false}
+};
+var cleaner = loch.allower(API.publicFields);
+var createValidator = _.partial(loch.validates, API.createParams);
+var updateValidator = _.partial(loch.validates, API.updateParams);
+
 
 exports.getPeople = function (req, res) {
     Person.allPeople(req.user, U.sendBack(res, function(res) {
@@ -18,11 +26,11 @@ exports.getPeople = function (req, res) {
 };
 
 exports.createPerson = function(req, res) {
-    var errors = loch.validates({params: [false, {}], active: false}, req.body);
+    var errors = createValidator(req.body);
     if(_.isObject(errors))
         return U.error(res, U.ERRORS.badRequest, {errors: errors});
     Person.createPerson(req.user, req.body,
-                        U.sendBack(res, cleaner, 201));
+                        U.sendBack(res, 201, cleaner));
 };
 
 exports.getPerson = function(req, res) {
@@ -30,8 +38,7 @@ exports.getPerson = function(req, res) {
 };
 
 exports.updatePerson = function(req, res) {
-    var errors = loch.validates({params: [false, {}], active: [false, ['true', 'false']]},
-                             req.body);
+    var errors = updateValidator(req.body);
     if(_.isObject(errors))
        return U.error(res, U.ERRORS.badRequest, {errors: errors});
     Person.updatePerson(req.user, req.params.personId, req.body,

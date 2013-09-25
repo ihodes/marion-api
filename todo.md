@@ -1,21 +1,11 @@
-# Validations
-*   DEFER [need a clean way to do this asynchronously; may need promises to not have callback hell. Should try to offer a nice DSL for doing so, though, ideally through the expected/allows maps as other validations are done.] Validate that ObjectIds passed in refer to a real, org-owned object (or else 404)
+# Must get done...
+
+## Validations
+* DEFER [need a clean way to do this asynchronously; may need promises to not have callback hell. Should try to offer a nice DSL for doing so, though, ideally through the expected/allows maps as other validations are done.] Validate that ObjectIds passed in refer to a real, org-owned object (or else 404)
 * Validate data types passed in...  e.g. protocolInstance.completedAt
 
 
-# Logging
-* Log ALL THE THINGS
-  * When things are created. (would be nice if you could hook into Mongoose for this)
-  * Errors. ALL OF THE ERRORS.
-
-
-# API - naming thoughts...
-* Protocols should be called "Scripts"
-* States should be called "Acts"
-* ProtocolInstances should be called "Plays" 
-
-
-# Testing
+## Testing
 * Make the tests script work better... 
 * Better mocks/test data
 * Test for all errors as well
@@ -23,14 +13,22 @@
 * All tests should refer to the Models loch validation map and make sure the response they recieve conforms (or something like that--so we're testing the API spec from the model; we shouldn't have to update it in both places. dry yo. DRY fo' life.)
 
 
-# API
-* Correctly allow/require and insert/update all spec'd parameters
+## API
 * Support 'expanding' subdocuments (e.g. an ObjectId would expand into the actual object)
 * Cascading deletes
+* Handle appending/deleting from arrays such as State.Messages (or, should this be handled RESTfully)
 
-
-# Processes
+## Processes
 * Webhooks for e.g. Twilio (how to generalize this?)
-* Scheduling daemon/queue mgmt/dispatch to Twilio etc
+  * accept responses from Twilio and create the correct Response objects correspondingly
+* Scheduling daemon/queue mgmt/dispatch to Twilio, webhooks etc.
+  * must also accept and handle responses from webhooks, twilio, etc.
 
+
+# Vague/Silly Ideas...
+
+## API - naming thoughts...
+* Protocols should be called "Scripts"
+* States should be called "Acts"
+* ProtocolInstances should be called "Plays" 
 

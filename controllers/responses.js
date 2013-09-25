@@ -4,17 +4,25 @@
 
 var _        = require('underscore'),
     loch     = require('loch'),
-    U        = require('../utils'),
+    U        = require('../lib/utils'),
     db       = require('../models/db'),
     Response = require('../models/response'),
-    logger   = require('../logger').logger;
+    logger   = require('../lib/logger').logger;
 
-
-var DISPLAY_WHITELIST = {_id: U._idToId, person: null, state: null,
-                         protocolInstance: null, messageName: null,
-                         intent: null, createdAt: null,
-                         text: null, completedAt: null}
-var cleaner = loch.allower(DISPLAY_WHITELIST);
+var API = {
+    publicFields: {_id: U._idToId, person: null, state: null,
+                   protocolInstance: null, messageName: null,
+                   intent: null, createdAt: null,
+                   text: null, completedAt: null},
+    createParams: {state: true, protocolInstance: true,
+                   completedAt: false, text: false,
+                   messageName: false},
+    updateParams: {completedAt: false, responseText: false,
+                   messageName: false}
+};
+var cleaner = loch.allower(API.publicFields);
+var createValidator = _.partial(loch.validates, API.createParams);
+var updateValidator = _.partial(loch.validates, API.updateParams);
 
 
 exports.getResponses = function (req, res) {
@@ -24,12 +32,10 @@ exports.getResponses = function (req, res) {
 }
 
 exports.createResponse = function (req, res) {
-    var validation = { state: true, protocolInstance: true, completedAt: false,
-                       text: false, messageName: false };
-    var errors = loch.validates(validation, req.body);
+    var errors = createValidator(req.body);
     if(_.isObject(errors))
         return U.error(res, U.ERRORS.badRequest, {errors: errors});
-    return Response.createResponse(req.user, req.body, U.sendBack(res, cleaner, 201));
+    return Response.createResponse(req.user, req.body, U.sendBack(res, 201, cleaner));
 }
 
 exports.getResponse = function (req, res) {
@@ -37,8 +43,7 @@ exports.getResponse = function (req, res) {
 }
 
 exports.updateResponse = function (req, res) {
-    var validation = { completedAt: false, responseText: false, messageName: false };
-    var errors = loch.validates(validation, req.body);
+    var errors = updateValidator(req.body);
     if(_.isObject(errors))
         return U.error(res, U.ERRORS.badRequest, {errors: errors});
     Response.updateResponse(req.user, req.params.responseId, req.body,

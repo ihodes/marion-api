@@ -4,21 +4,34 @@
 
 var _      = require('underscore'),
     loch   = require('loch'),
-    U      = require('../utils'),
+    U      = require('../lib/utils'),
     State  = require('../models/state'),
-    logger = require('../logger').logger;
+    logger = require('../lib/logger').logger;
 
 
-var DISPLAY_WHITELIST = {_id: U._idToId, protocol: null, isTerminal: null,
-                         messages: null, transitions: null};
-var cleaner = loch.allower(DISPLAY_WHITELIST);
-
-var validation = { messages:    [true, [{ type: false, body: false,
-                                          destination: true, name: false }]],
-                   transitions: [false, [{pending: [true, loch.isArrayOfScalars],
-                                          classifier: true,
-                                          toState: true}]],
-                   isTerminal:  [false, _.isBoolean] };
+var API = {
+    publicFields: {_id: U._idToId, protocol: null, isTerminal: null,
+                   messages: null, transitions: null},
+    createParams: {messages: [true,
+                              [{ type: false, body: false,
+                                 destination: true, name: false }]],
+                   transitions: [false,
+                                 [{pending: [true, loch.isArrayOfScalars],
+                                   classifier: true,
+                                   toState: true}]],
+                   isTerminal: [false, _.isBoolean]},
+    updateParams: {messages: [true,
+                              [{ type: false, body: false,
+                                 destination: true, name: false }]],
+                   transitions: [false,
+                                 [{pending: [true, loch.isArrayOfScalars],
+                                   classifier: true,
+                                   toState: true}]],
+                   isTerminal: [false, _.isBoolean]}
+};
+var cleaner = loch.allower(API.publicFields);
+var createValidator = _.partial(loch.validates, API.createParams);
+var updateValidator = _.partial(loch.validates, API.updateParams);
 
 
 exports.getStates = function (req, res) {
@@ -28,11 +41,11 @@ exports.getStates = function (req, res) {
 };
 
 exports.createState = function(req, res) {
-    var errors = loch.validates(validation, req.body);
+    var errors = createValidator(req.body);
     if(_.isObject(errors))
         return U.error(res, U.ERRORS.badRequest, {errors: errors});
     return State.createState(req.user, req.params.protocolId, req.body,
-                             U.sendBack(res, cleaner, 201));
+                             U.sendBack(res, 201, cleaner));
 };
 
 exports.getState = function(req, res) {
@@ -40,7 +53,7 @@ exports.getState = function(req, res) {
 };
 
 exports.updateState = function(req, res) {
-    var errors = loch.validates(validation, req.body);
+    var errors = updateValidator(req.body);
     if(_.isObject(errors))
         return U.error(res, U.ERRORS.badRequest, {errors: errors});
     State.updateState(req.user, req.params.stateId, req.body,

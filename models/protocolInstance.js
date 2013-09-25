@@ -4,8 +4,8 @@
 
 var _      = require('underscore'),
     db     = require('./db'),
-    utils  = require('../utils'),
-    logger = require('../logger').logger;
+    utils  = require('../lib/utils'),
+    logger = require('../lib/logger').logger;
 
 
 exports.allProtocolInstances = function(org, callback) {

@@ -3,17 +3,31 @@
 'use strict';
 
 var _        = require('underscore'),
-    loch   = require('loch'),
-    U        = require('../utils'),
+    loch     = require('loch'),
+    U        = require('../lib/utils'),
     db       = require('../models/db'),
     Schedule = require('../models/schedule'),
-    logger = require('../logger').logger;
+    logger   = require('../lib/logger').logger;
 
 
-var DISPLAY_WHITELIST = { _id: U._idToId, frequency: null, sendTime: null,
-                          active: null, person: null, protocol: null,
-                          createdAt: null }
-var cleaner = loch.allower(DISPLAY_WHITELIST);
+var API = {
+    publicFields: {_id: U._idToId, frequency: null, sendTime: null,
+                   active: null, person: null, protocol: null,
+                   createdAt: null},
+    createParams: {active: [false, ['true', 'false']], person: true,
+                   protocol: true, sendTime: [true, U.isTime],
+                   frequency: [true, frequencies]},
+    updateParams: {active: [false, ['true', 'false']],
+                   sendTime: [false, U.isTime],
+                   frequency: [false, frequencies]}
+};
+var cleaner = loch.allower(API.publicFields);
+var createValidator = _.partial(loch.validates, API.createParams);
+var updateValidator = _.partial(loch.validates, API.updateParams);
+
+var frequencies  = ['sundays', 'mondays', 'tuesdays', 'wednesdays',
+                    'thursdays', 'fridays', 'saturdays', 'daily',
+                    'once'];
 
 
 exports.getSchedules = function (req, res) {
@@ -23,14 +37,11 @@ exports.getSchedules = function (req, res) {
 };
 
 exports.createSchedule = function(req, res) {
-    var validation = {active: [false, ['true', 'false']], person: true,
-                      protocol: true, sendTime: [true, U.isTime],
-                      frequency: [true, Schedule.FREQUENCIES]}
-    var errors = loch.validates(validation, req.body);
+    var errors = createValidator(req.body);
     if(_.isObject(errors))
         return U.error(res, U.ERRORS.badRequest, {errors: errors});
     return Schedule.createSchedule(req.user, req.body,
-                                   U.sendBack(res, cleaner, 201));
+                                   U.sendBack(res, 201, cleaner));
 };
 
 exports.getSchedule = function(req, res) {
@@ -38,10 +49,7 @@ exports.getSchedule = function(req, res) {
 };
 
 exports.updateSchedule = function(req, res) {
-    var validation = {active: [false, ['true', 'false']],
-                      sendTime: [false, U.isTime],
-                      frequency: [false, Schedule.FREQUENCIES]}
-    var errors = loch.validates(validation, req.body);
+    var errors = updateValidator(req.body);
     if(_.isObject(errors))
         return U.error(res, U.ERRORS.badRequest, {errors: errors});
     Schedule.updateSchedule(req.user, req.params.scheduleId,

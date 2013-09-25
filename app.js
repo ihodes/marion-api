@@ -1,10 +1,11 @@
 'use strict';
 
+require('./lib/db_initializer');
 var _            = require('underscore'),
     express      = require('express'),
     config       = require('./config'),
     Organization = require('./models/organization'),
-    logging       = require('./logger');
+    logging       = require('./lib/logger');
 require('express-namespace');
 var logger = logging.logger;
 

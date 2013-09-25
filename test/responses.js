@@ -3,7 +3,7 @@
 var request  = require('request'),
     assert   = require('assert'),
     should   = require('should'),
-    logger   = require('../logger').logger,
+    logger   = require('../lib/logger').logger,
     config   = require('./testsettings');
 var BASE = config.auth_url(config.SETTINGS.ORG_KEY);
 var UNAUTH_BASE = config.auth_url('bad-key');

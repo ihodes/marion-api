@@ -3,7 +3,7 @@
 var _      = require('underscore'),
     db     = require('./db'),
     config = require('../config'),
-    utils  = require('../utils');
+    utils  = require('../lib/utils');
 
 
 exports.authenticate = function(username, password, callback) {

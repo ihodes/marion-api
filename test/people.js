@@ -3,7 +3,8 @@
 var request  = require('request'),
     assert   = require('assert'),
     should   = require('should'),
-    config   = require('./testsettings');
+    config   = require('./testsettings'),
+    logger   = require('../lib/logger').logger;
 var BASE = config.auth_url(config.SETTINGS.ORG_KEY);
 var UNAUTH_BASE = config.auth_url('bad-key');
 
@@ -73,7 +74,7 @@ describe('People', function() {
         it('Should respond with updated person', 
            function(done) {
                var path = BASE + 'person/' + person.id;
-               var params = { active: false, params: { age: 152, number: '+17776666666' }};
+               var params = { active: false, params: { age: '152', number: '+17776666666' }};
                person.active = params.active;
                person.params.age = params.params.age;
                person.params.number = params.params.number;
@@ -83,9 +84,12 @@ describe('People', function() {
                    if(res.statusCode != 200) throw new Error('Status != 200');
 
                    var response = JSON.parse(body);
+
+                   response.should.be.a('object');
                    response.active.should.be.false;
                    response.params.name.should.equal(person.params.name);
                    response.params.number.should.equal(person.params.number);
+                   response.params.age.should.equal(person.params.age);
 
                    done();
                });
@@ -97,7 +101,7 @@ describe('People', function() {
            function(done) {
                var path = BASE + 'person/' + person.id;
 
-               request.post(path, {}, function(err, res, body) {
+               request.get(path, {}, function(err, res, body) {
                    if(err) throw err;
                    if(res.statusCode != 200) throw new Error('Status != 200');
 
@@ -116,7 +120,7 @@ describe('People', function() {
            function(done) {
                var path = BASE + 'person/' + 'no-id-here';
 
-               request.post(path, {}, function(err, res, body) {
+               request.get(path, {}, function(err, res, body) {
                    if(err) throw err;
                    if(res.statusCode != 404) throw new Error('Status != 200');
                    done();

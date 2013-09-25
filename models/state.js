@@ -4,8 +4,7 @@
 
 var _      = require('underscore'),
     db     = require('./db'),
-    utils  = require('../utils'),
-    logger = require('../logger').logger;
+    logger = require('../lib/logger').logger;
 
 
 exports.allStates = function(org, protocolId, callback) {

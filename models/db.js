@@ -4,50 +4,11 @@
 var mongoose = require('mongoose'),
     config   = require('../config'),
     _        = require('underscore'),
-    uuid     = require('node-uuid');
+    uuid     = require('node-uuid'),
+    logger   = require('../lib/logger').logger,
+    U        = require('../lib/utils'),
+    loch     = require('loch');
 var ObjectId = mongoose.Schema.ObjectId;
-
-var connect = function () {
-    mongoose.connect(config.settings.MONGO);
-
-    mongoose.connection.on('error', function () {
-        console.log('Mongoose error: ' + config.settings.MONGO);
-    });
-
-    mongoose.connection.on('connecting', function () {
-        console.log('Mongoose connecting: ' + config.settings.MONGO);
-    });
-
-    mongoose.connection.on('connected', function () {
-        console.log('Mongoose connected: ' + config.settings.MONGO);
-    });
-
-    mongoose.connection.on('open', function () {
-        console.log('Mongoose open: ' + config.settings.MONGO);
-    });
-
-    mongoose.connection.on('disconnecting', function () {
-        console.log('Mongoose disconnecting: ' + config.settings.MONGO);
-    });
-
-    mongoose.connection.on('disconnected', function () {
-        console.log('Mongoose disconnected: ' + config.settings.MONGO);
-    });
-
-    mongoose.connection.on('close', function () {
-        console.log('Mongoose close: ' + config.settings.MONGO);
-    });
-
-    mongoose.connection.on('reconnected', function () {
-        console.log('Mongoose reconnected: ' + config.settings.MONGO);
-    });
-
-    mongoose.connection.on('fullsetup', function () {
-        console.log('Mongoose fullsetup: ' + config.settings.MONGO);
-    });
-};
-
-connect();
 
 
 var personSchema = new mongoose.Schema({
@@ -56,6 +17,9 @@ var personSchema = new mongoose.Schema({
 
     params:       {type: Object},
     active:       {type: Boolean, default: true},
+});
+personSchema.post('save', function(doc) {
+    logger.info('Saved Person: ' + JSON.stringify(doc.toObject()));
 });
 exports.Person = mongoose.model('person', personSchema);
 
@@ -71,6 +35,9 @@ var scheduleSchema = new mongoose.Schema({
     frequency:    {type: String, required: true},
 
 });
+scheduleSchema.post('save', function(doc) {
+    logger.info('Saved Schedule: '+JSON.stringify(doc.toObject()));
+});
 exports.Schedule = mongoose.model('schedule', scheduleSchema);
 
 
@@ -81,6 +48,9 @@ var organizationSchema = new mongoose.Schema({
         return uuid.v4().toString('base64');
     }},
     timezone:  {type: String, default: 'UTC'},
+});
+organizationSchema.post('save', function(doc) {
+    logger.info('Saved Organization: '+JSON.stringify(doc.toObject()));
 });
 exports.Organization = mongoose.model('organization', organizationSchema);
 
@@ -93,6 +63,9 @@ var protocolSchema = new mongoose.Schema({
     name:         {type: String, required: true},
     description:  {type: String, required: false},
     published:    {type: Boolean, default: false},
+});
+protocolSchema.post('save', function(doc) {
+    logger.info('Saved Protocol: '+JSON.stringify(doc.toObject()));
 });
 exports.Protocol = mongoose.model('protocol', protocolSchema);
 
@@ -112,6 +85,9 @@ var stateSchema = new mongoose.Schema({
 
     isTerminal:   {type: Boolean, default: false},
 });
+stateSchema.post('save', function(doc) {
+    logger.info('Saved State: '+JSON.stringify(doc.toObject()));
+});
 exports.State = mongoose.model('state', stateSchema);
 
 
@@ -125,6 +101,9 @@ var responseSchema = new mongoose.Schema({
     messageName: {type: String, required: true},
     text:        {type: String, required: false},
 });
+responseSchema.post('save', function(doc) {
+    logger.info('Saved Response: '+JSON.stringify(doc.toObject()));
+});
 exports.Response = mongoose.model('response', responseSchema);
 
 
@@ -136,5 +115,8 @@ var protocolInstanceSchema = new mongoose.Schema({
     schedule:     {type: ObjectId, required: false, ref: 'schedule'},
     currentState: {type: ObjectId, required: false, ref: 'state'},
     completedAt:  {type: Date, required: false},
+});
+protocolInstanceSchema.post('save', function(doc) {
+    logger.info('Saved ProtocolInstance: '+JSON.stringify(doc.toObject()));
 });
 exports.ProtocolInstance = mongoose.model('protocolInstance', protocolInstanceSchema);

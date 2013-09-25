@@ -4,7 +4,7 @@ var request  = require('request'),
     assert   = require('assert'),
     should   = require('should'),
     config   = require('./testsettings'),
-    logger = require('../logger').logger;
+    logger = require('../lib/logger').logger;
 var BASE = config.auth_url(config.SETTINGS.ORG_KEY);
 
 

@@ -3,16 +3,24 @@
 'use strict';
 
 var _        = require('underscore'),
-    loch   = require('loch'),
-    U        = require('../utils'),
+    loch     = require('loch'),
+    U        = require('../lib/utils'),
     db       = require('../models/db'),
     Protocol = require('../models/protocol'),
-    logger = require('../logger').logger;
+    logger   = require('../lib/logger').logger;
 
 
-var DISPLAY_WHITELIST = {_id: U._idToId, initialState: null,
-                         name: null, description: null, createdAt: null}
-var cleaner = loch.allower(DISPLAY_WHITELIST);
+var API = {
+    publicFields: {_id: U._idToId, initialState: null,
+                   name: null, description: null, createdAt: null},
+    createParams: {initialState: false, name: true,
+                   description: true},
+    updateParams: {initialState: false, name: false,
+                   description: false}
+};
+var cleaner = loch.allower(API.publicFields);
+var createValidator = _.partial(loch.validates, API.createParams);
+var updateValidator = _.partial(loch.validates, API.updateParams);
 
 
 exports.getProtocols = function (req, res) {
@@ -22,12 +30,11 @@ exports.getProtocols = function (req, res) {
 };
 
 exports.createProtocol = function(req, res) {
-    var validation = {initialState: false, name: true, description: true};
-    var errors = loch.validates(validation, req.body);
+    var errors = createValidator(req.body);
     if(_.isObject(errors))
         return U.error(res, U.ERRORS.badRequest, {errors: errors});
     return Protocol.createProtocol(req.user, req.body,
-                                   U.sendBack(res, cleaner, 201));
+                                   U.sendBack(res, 201, cleaner));
 };
 
 exports.getProtocol = function(req, res) {
@@ -35,8 +42,7 @@ exports.getProtocol = function(req, res) {
 };
 
 exports.updateProtocol = function(req, res) {
-    var validation = {initialState: false, name: false, description: false};
-    var errors = loch.validates(validation, req.body);
+    var errors = updateValidator(req.body);
     if(_.isObject(errors))
         return U.error(res, U.ERRORS.badRequest, {errors: errors});
     Protocol.updateProtocol(req.user, req.params.protocolId,

@@ -5,7 +5,7 @@ var request  = require('request'),
     should   = require('should'),
     config   = require('./testsettings'),
     db       = require('../models/db'),
-    logger   = require('../logger').logger;
+    logger   = require('../lib/logger').logger;
 var BASE = config.auth_url(config.SETTINGS.ORG_KEY);
 
 var state = {};
@@ -21,7 +21,9 @@ describe('States', function() {
         it('Should respond 201 with state',
            function(done) {
                var path = BASE + 'states';
-               var params = { messages: [{type: 'text', body: 'Hello. How are you?', destination: '$Person.params.cell_number', name: 'howYouIs'}] };
+               var params = { messages: [{type: 'text', body: 'Hello. How are you?',
+                                          destination: '$Person.params.cell_number',
+                                          name: 'howYouIs'}] };
 
                request.post(path, {form: params}, function(err, res, body) {
                    if(err) throw err;
