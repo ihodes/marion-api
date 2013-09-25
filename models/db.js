@@ -8,6 +8,7 @@ var mongoose = require('mongoose'),
     logger   = require('../lib/logger').logger,
     U        = require('../lib/utils'),
     loch     = require('loch');
+require('../lib/db_initializer'); // connect to db
 var ObjectId = mongoose.Schema.ObjectId;
 
 

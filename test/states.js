@@ -10,12 +10,15 @@ var BASE = config.auth_url(config.SETTINGS.ORG_KEY);
 
 var state = {};
 
-
-db.Protocol.findOne(function(err, protocol) {
-    state.protocol = protocol._id;
-    BASE = BASE + 'protocol/' + state.protocol + '/';
-
 describe('States', function() {
+    before(function(done) {
+        db.Protocol.findOne(function(err, protocol) {
+            state.protocol = protocol._id;
+            BASE = BASE + 'protocol/' + state.protocol + '/';
+            done();
+        });
+    });
+
 
     describe('POST /v1/states...', function () {
         it('Should respond 201 with state',
@@ -110,6 +113,4 @@ describe('States', function() {
                });
            });
     });
-});
-
 });
