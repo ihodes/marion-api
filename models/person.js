@@ -26,6 +26,7 @@ exports.getPerson = function(org, personId, callback) {
 exports.updatePerson = function(org, personId, params, callback) {
     var query = { organization: org, _id: personId };
     db.Person.findOne(query, function (err, person) {
+        if (!person) return callback(err, null);
         person = _.omit(person.toObject(), '__v', '_id');
         var newPerson = U.deepMergeJSON(person, params);
         db.Person.update(query, newPerson, function() {

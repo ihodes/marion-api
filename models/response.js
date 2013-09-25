@@ -4,7 +4,7 @@
 
 var _      = require('underscore'),
     db     = require('./db'),
-    utils  = require('../lib/utils'),
+    U      = require('../lib/utils'),
     logger = require('../lib/logger').logger;
 
 
@@ -24,12 +24,13 @@ exports.getResponse = function(org, responseId, callback) {
 
 exports.updateResponse = function(org, responseId, params, callback) {
     var query = { organization: org, _id: responseId };
-    db.Response.findOne(query, function(err, response) {
-        if(!response) return callback(err, null);
-        // TK TODO -- implement properly (or use .update instead)
-        for(var key in params)
-            response[key] = params[key];
-        return response.save(callback);
+    db.Response.findOne(query, function (err, response) {
+        if (!response) return callback(err, null);
+        response = _.omit(response.toObject(), '__v', '_id');
+        var newResponse = U.deepMergeJSON(response, params);
+        db.Response.update(query, newResponse, function() {
+            db.Response.findOne(query, callback);
+        });
     });
 };
 

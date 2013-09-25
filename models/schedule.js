@@ -5,7 +5,7 @@
 var _      = require('underscore'),
     db     = require('./db'),
     config = require('../config'),
-    utils  = require('../lib/utils');
+    U      = require('../lib/utils');
 
 
 exports.allSchedules = function(org, callback) {
@@ -24,12 +24,13 @@ exports.getSchedule = function(org, scheduleId, callback) {
 
 exports.updateSchedule = function(org, scheduleId, params, callback) {
     var query = { _id: scheduleId, organization: org };
-    db.Schedule.findOne(query, function(err, schedule) {
-        if(!schedule) return callback(err, null);
-        // TK TODO -- implement properly (or use .update instead)
-        for(var key in params)
-            schedule[key] = params[key];
-        schedule.save(callback);
+    db.Schedule.findOne(query, function (err, schedule) {
+        if (!schedule) return callback(err, null);
+        schedule = _.omit(schedule.toObject(), '__v', '_id');
+        var newSchedule = U.deepMergeJSON(schedule, params);
+        db.Schedule.update(query, newSchedule, function() {
+            db.Schedule.findOne(query, callback);
+        });
     });
 };
 

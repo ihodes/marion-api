@@ -4,7 +4,8 @@
 
 var _      = require('underscore'),
     db     = require('./db'),
-    logger = require('../lib/logger').logger;
+    logger = require('../lib/logger').logger,
+    U      = require('../lib/utils');
 
 
 exports.allStates = function(org, protocolId, callback) {
@@ -23,13 +24,13 @@ exports.getState = function(org, stateId, callback) {
 
 exports.updateState = function(org, stateId, params, callback) {
     var query = { organization: org, _id: stateId };
-    db.State.findOne(query, function(err, state) {
-        if(!state) return callback(err, null);
-        // TK TODO -- implement properly (or use .update instead)
-        for(var key in params)
-            state[key] = params[key];
-        state.messages = params.messages;
-        return state.save(callback);
+    db.State.findOne(query, function (err, state) {
+        if (!state) return callback(err, null);
+        state = _.omit(state.toObject(), '__v', '_id');
+        var newState = U.deepMergeJSON(state, params);
+        db.State.update(query, newState, function() {
+            db.State.findOne(query, callback);
+        });
     });
 };
 

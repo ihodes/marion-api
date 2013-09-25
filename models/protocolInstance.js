@@ -4,7 +4,7 @@
 
 var _      = require('underscore'),
     db     = require('./db'),
-    utils  = require('../lib/utils'),
+    U      = require('../lib/utils'),
     logger = require('../lib/logger').logger;
 
 
@@ -24,12 +24,13 @@ exports.getProtocolInstance = function(org, protocolInstanceId, callback) {
 
 exports.updateProtocolInstance = function(org, protocolInstanceId, params, callback) {
     var query = { organization: org, _id: protocolInstanceId };
-    db.ProtocolInstance.findOne(query, function(err, protocolInstance) {
-        if(!protocolInstance) return callback(err, null);
-        // TK TODO -- implement properly (or use .update instead)
-        for(var key in params)
-            protocolInstance[key] = params[key];
-        return protocolInstance.save(callback);
+    db.ProtocolInstance.findOne(query, function (err, protocolInstance) {
+        if (!protocolInstance) return callback(err, null);
+        protocolInstance = _.omit(protocolInstance.toObject(), '__v', '_id');
+        var newProtocolInstance = U.deepMergeJSON(protocolInstance, params);
+        db.ProtocolInstance.update(query, newProtocolInstance, function() {
+            db.ProtocolInstance.findOne(query, callback);
+        });
     });
 };
 
