@@ -1,16 +1,19 @@
 # Marion Health SMS API v1 Spec
 
-Endpoint is https://api.getmarion.com/v1
+Endpoint is `https://api.marion.io/v1/`.
 
-Auth is basic auth, username 'api' and password <api-key>.
+Auth is HTTP Basic Auth, username blank and password <api-key>. E.g. `https://:<api-key>@api.marion.io/v1/`.
+
+All data should be posted to the API with HTTP header `Content-type: application/json`, and the data should be valid [JSON](http://json.org).
+
 
 ## Resources
 
 * Person
 * Schedule
 * Response
+* ProtocolInstance
 * Protocol
-  * ProtocolInstance
   * State
 
 
@@ -19,8 +22,9 @@ Auth is basic auth, username 'api' and password <api-key>.
 A Person is the entity interacting with a message Protocol. They're the ones with the cell phones, responding to SMS messages.
 
     id            ::  id
-    active        ::  boolean (default: true)
-    params        ::  {}
+    createdAt     ::  Timestamp
+    active        ::  Boolean (default: true)
+    params        ::  { key: val } - any data can be stored in here
 
 
 ### The Schedule Object
@@ -28,27 +32,26 @@ A Person is the entity interacting with a message Protocol. They're the ones wit
 A schedule ties a Protocol to a Person, initiating the protocol on a recurring basis (starting at `start_at`), or once, depending on the `frequency`.
 
     id            ::  id
-    active        ::  boolean (default: true)
     person        ::  id, references Person
     protocol      ::  id, references Protocol
-    sendTime      ::  string (HH:MM:SS)
-    frequency     ::  string \in [daily, monday..sunday, once]
+    createdAt     ::  Timestamp
+    sendTime      ::  Hour, (0-24)
+    frequency     ::  String \in [daily, mondays..sundays, once]
+    active        ::  Boolean (default: true)
 
 
 ### The Response Object
 
 Responses represent a Person's response to a given Protocol. 
 
-`intent` is a summary of Person's communication via the protocol. `messages_exchanged` is a map of state_strings to messages recieved from the Person at that State. `completed_at` is the time at which the Protocol reached a terminal state, or timed out (thus terminating the Protocol).
-
     id                    ::  id
     person                ::  id, references Person
     state                 ::  id, references State
     protocolInstance      ::  id, references ProtocolInstance
-    intent                ::  string (TBI)
-    completedAt           ::  datetime
-    createdAt             ::  datetime
-    messagesExchanged     ::  {string:string} (currently responseText::String, TBI)
+    messageName           ::  String, references a message in State that is being responsed to
+    createdAt             ::  Timestamp
+    text                  ::  String, the actual response to the message
+    completedAt           ::  Timestamp
     
     
 ### The Protocol Object
@@ -58,17 +61,22 @@ A protocol is a script reprsenting messages sent out by Marion SMS and the conse
 Protocols are created with a name and description, and states are then added to it. In order for a Protocol to be valid, one State must be designated the initial state, and ther emust be a path to a terminal state from there. There may be no non-terminating sequences; the protocol must halt.
 
     id                ::  id
-    states            ::  [id, references State, ...]
-    initial_state     ::  id, references State
-    name              ::  string
-    description       ::  string
+    initialState      ::  id, references State
+    createdAt         ::  Timestamp
+    name              ::  String
+    description       ::  String
     
     
 ### The ProtocolInstance
 
-A "run" of the Protocol on a Person at a given Scheduled time; contains its responses and the intent Person wished to convey with her answers.
+A "run" of the Protocol on a Person at a given Scheduled time.
 
-...
+    id                ::  id
+    protocol          ::  id, references Protocol
+    schedule          ::  id, references Schedule
+    currentState      ::  id, references State
+    createdAt         ::  Timestamp
+    completedAt       ::  Timestamp
 
     
 ### The State Object
@@ -77,14 +85,25 @@ A schedule ties a Protocol to a Person, initiating the protocol on a recurring b
 
     id                ::  id
     protocol          ::  id, references Protocol
-    terminal          ::  boolean
-    on_enter          ::  {messages: [string, ...], webhooks: [url, ...]}
-    transitions       ::  {transition:state_id, ...}
+    isTerminal        ::  Boolean
+    messages          ::  [message]
+    transitions       ::  [rule]
+    
+Where a message is: 
+
+    name              ::  String
+    type              ::  String, \in [text, webhook, etc.]
+    body              ::  String
+    destination       ::  String
+    
+And a rule is: 
+
+    toState           ::  id, references State
+    pending           ::  [String], names of messages
+    classifier        ::  String
     
 
-
-<br><br>
-###### Transitions (for states)
+###### Classifiers (for States)
 
 A transition is a string that specifies the kind of response which will lead to the next state. They are: 
 
@@ -106,12 +125,12 @@ A transition is a string that specifies the kind of response which will lead to 
 *Params:*  
 
     active        ::  boolean (default: true)  [optional]
-    params        ::  array of key:values      [optional]
+    params        ::  { key:values }           [optional]
 
 
 **Update a person, returning it.**  
 `POST /person/{PERSON_ID}`  
-*Params:* [same as above]  
+*Params:* [same as above]
 
 **Return all person objects.**  
 `GET /people`  
@@ -125,66 +144,100 @@ A transition is a string that specifies the kind of response which will lead to 
 
     confirm      ::  boolean (default: false)  [required]
     
-*NB: Prefer to deactivate the person, as deleting a person is permanent and cascades, deleting all schedules and responses associated with that person object.*
+*NB: Prefer to deactivate the person, as deleting a person is permanent and cascades, deleting all schedules associated with that person object.*
 
 
 
 ### Schedule
 
 **Create a new schedule, returning it.**  
-`POST /person/{PERSON_ID}/schedules`  
+`POST /schedules`  
 *Params:*  
 
-    protocol_id   ::  uuid                     [required]     
-    frequency     ::  string                   [required]
-    start_at      ::  timestamp                [required]
-    active        ::  boolean (default: true)  [optional]
+    protocol      ::  id                       [required]
+    person        ::  id                       [required]
+    frequency     ::  String                   [required]
+    sendTime      ::  Number, hour (0-24)      [required]
+    active        ::  Boolean (default: true)  [optional]
 
 
 **Update a schedule, returning it.**  
-`POST /person/{PERSON_ID}/schedule/{SCHEDULE_ID}`  
-*Params:* [same as above]  
+`POST /schedule/{SCHEDULE_ID}`
+*Params:*  
+
+    protocol      ::  id                       [required]
+    person        ::  id                       [required]
+    frequency     ::  String                   [optional]
+    sendTime      ::  Number, hour (0-24)      [optional]
+    active        ::  Boolean (default: true)  [optional]
 
 **Return all schedule objects for a given person.**  
-`GET /person/{PERSON_ID}/schedules`  
+`GET /schedules`
 
 **Return the schedule object.**  
-`GET /person/{PERSON_ID}/schedule/{SCHEDULE_ID}`  
+`GET /schedule/{SCHEDULE_ID}`
 
 **Delete the schedule object, and returns it.**  
-`DELETE /person/{PERSON_ID}/schedule/{SCHEDULE_ID}`  
+`DELETE /schedule/{SCHEDULE_ID}`
 
 *NB This does NOT delete the responses associated with the object, and you can still retrieve this schedule by ID.*
 
 
 ### Response
 
-**[PRIVATE] Create a new response, returning it.**  
-`POST /patient/{PATIENT_ID}/responses`  
+###### TK : Private CUD methods?
 
-**[PRIVATE] Update a response, returning it.**  
-`POST /patient/{PATIENT_ID}/response/{RESPONSE_ID}`  
+**Create a new response, returning it.**  
+`POST /responses`  
 
-**Return all response objects for a given patient.**  
-`GET /patient/{PATIENT_ID}/responses`  
+*Params:*  
 
-**Return the response object.**  
-`GET /patient/{PATIENT_ID}/response/{RESPONSE_ID}`  
+    protocolInstance   ::  id                       [required]
+    state              ::  id                       [required]
+    messageName        ::  String                   [required]
+    text               ::  String                   [optional]
 
-**[PRIVATE] Delete the response object, and returns it.**  
-`DELETE /patient/{PATIENT_ID}/response/{RESPONSE_ID}`  
+
+**Update a response, returning it.**  
+`POST /response/{RESPONSE_ID}`  
+
+*Params:*
+
+     text               ::  String                   [optional]
+
+**Return all response objects.**
+`GET /responses`  
+
+**Return the response object.**
+`GET /response/{RESPONSE_ID}`  
+
+**Delete the response object, and returns it.**
+`DELETE /response/{RESPONSE_ID}`  
 
 
 ### Protocol
 
 **Create a new protocol, returning it.**  
-`POST /person/{PERSON_ID}/protocols`  
+`POST /protocols`  
+
+*Params:*
+
+    initialState          ::  id                     [optional]
+    name                  ::  String                 [required]
+    description           ::  String                 [required]
 
 **Update a protocol, returning it.**  
 `POST /protocol/{PROTOCOL_ID}`  
 
-**Return all protocol objects for a given person.**  
-`GET /protocols`  
+*Params:*
+
+    initialState          ::  id                     [optional]
+    name                  ::  String                 [optional]
+    description           ::  String                 [optional]
+    
+
+**Return all protocol objects.**  
+`GET /protocols`
 
 **Return the protocol object.**  
 `GET /protocol/{PROTOCOL_ID}`  
@@ -199,23 +252,79 @@ A transition is a string that specifies the kind of response which will lead to 
 ### State
 
 **Create a new state, returning it.**  
-`POST /protocol/{PROTOCOL_ID}/states`  
+`POST /states`  
+
+*Params:*
+
+    protocol          ::  id, references Protocol                 [required]
+    isTerminal        ::  Boolean, default false                  [optional]
+    messages          ::  [message]                               [optional]
+    transitions       ::  [rule]                                  [optional]
+    
+Where a message is: 
+
+    name              ::  String                                  [optional]
+    type              ::  String, \in [text, webhook, etc.]       [required]
+    body              ::  String                                  [optional]
+    destination       ::  String                                  [required]
+    
+And a rule is: 
+
+    toState           ::  id, references State, or null           [reguired]
+    pending           ::  [String], names of messages             [required]
+    classifier        ::  String                                  [required]
+
 
 **Update a state, returning it.**  
-`POST /protocol/{PROTOCOL_ID}/state/{STATE_ID}`  
+`POST /state/{STATE_ID}`  
+
+*Params:*
+
+    isTerminal        ::  Boolean, default false                  [optional]
+    messages          ::  [message]                               [optional]
+    transitions       ::  [rule]                                  [optional]
+    
 
 **Return all state objects for a given protocol.**  
-`GET /protocol/{PROTOCOL_ID}/states`  
+`GET /states`  
 
 **Return the state object.**  
-`GET /protocol/{PROTOCOL_ID}/state/{STATE_ID}`  
+`GET /state/{STATE_ID}`  
 
 **Delete the state object, and returns it.**  
-`DELETE /protocol/{PROTOCOL_ID}/state/{STATE_ID}`  
+`DELETE /state/{STATE_ID}`  
 
 *NB This does NOT delete the responses associated with the object, and you can still retrieve this state by ID.*
 
 
 
+### ProtocolInstance
 
-NB: We support DELETE from HTML forms by checking for a field & value \_\_METHOD=DELETE and rewriting the HTTP method to that method, if specified, from POST.
+###### TK : Private CUD methods?
+
+**Create a new protocolInstance, returning it.**  
+`POST /protocolInstances`  
+
+*Params:*
+
+    protocol          ::  id, references Protocol            [required]
+    schedule          ::  id, references Schedule            [required]
+    currentState      ::  id, references State               [required]
+    completedAt       ::  Timestamp                          [optional]
+
+**Update a protocol instance, returning it.**  
+`POST /protocolInstance/{PROTOCOLINSTANCE_ID}`  
+
+*Params:*
+
+    currentState      ::  id, references State               [optional]
+    completedAt       ::  Timestamp                          [optional]    
+
+**Return all protocol objects.**  
+`GET /protocolInstances`
+
+**Return the protocol object.**  
+`GET /protocolInstance/{PROTOCOLINSTANCE_ID}`  
+
+**Delete the protocol object, and returns it.**  
+`DELETE /protocolInstance/{PROTOCOLINSTANCE_ID}`  

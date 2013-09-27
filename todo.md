@@ -4,6 +4,10 @@
 
 ### Necessary before launch
 * Cascading deletes, where appropriate/specified in the API docs.
+* require json or specify when JSON is expected? 
+* don't allow repsonses and other things to be deleted? (remove from API, docs)
+* don't allow estructive updates of PHI (e.g. version Responses, maybe Patients? others?) 
+* filterse
 
 ### Validations
 * Validate that ObjectIds passed in refer to a real, org-owned object (or else 404).
@@ -21,7 +25,7 @@
   model; we shouldn't have to update it in both places. dry yo. DRY fo' life).
 
 ## Other
-* Support 'expanding' subdocuments (e.g. an ObjectId would expand into the actual object).
+* Support 'expanding' subdocuments (e.g. an ObjectId would expand into the actual object) (or you can include children objects, e.g. all the responses that refer to a protocolInstance)
 * Handle appending/deleting from arrays such as State.Messages (or, should this be handled RESTfully).
 * Handle datatype being posted to the API--since we have array in some resources (namely, State), 
   should we require text/json? Or only where it's needed? Or just allow it to be text/form-data and append
@@ -38,6 +42,7 @@
 * Scheduling daemon/queue mgmt/dispatch to Twilio, webhooks etc.
   * Must also accept and handle responses from webhooks, twilio, etc.
   * Must also assign a person to a given outgoing twilio # for every different protocol/or organization... 
+* Timeout daemon (check in-progress PIs and handle timeouts)
 
 ### Transition functions
 * NLP
