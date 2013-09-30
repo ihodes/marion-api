@@ -73,15 +73,15 @@ describe('Responses', function() {
         it('Should respond with updated response', 
            function(done) {
                var path = BASE + 'response/' + response.id;
-               var params = { messageName: 'newVarName' };
-               response.messageName = params.messageName;
+               var params = { text: 'new response text' };
+               response.text = params.text;
 
                request.post(path, {form: params}, function(err, res, body) {
                    if(err) throw err;
-                   if(res.statusCode != 200) throw new Error('Status != 200');
+                   if(res.statusCode != 200) throw new Error('Status != 200 ('+res.statusCode+', '+res.body+')');
 
                    var resp = JSON.parse(body);
-                   resp.messageName.should.equal(response.messageName);
+                   resp.text.should.equal(response.text);
 
                    done();
                });

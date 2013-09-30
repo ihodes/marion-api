@@ -63,7 +63,6 @@ var protocolSchema = new mongoose.Schema({
     initialState: {type: ObjectId, required: false, ref: 'state'},
     name:         {type: String, required: true},
     description:  {type: String, required: false},
-    published:    {type: Boolean, default: false},
 });
 protocolSchema.post('save', function(doc) {
     logger.info('Saved Protocol: '+JSON.stringify(doc.toObject()));

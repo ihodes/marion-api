@@ -15,19 +15,23 @@ var API = {
                    active: null, person: null, protocol: null,
                    createdAt: null},
     createParams: {active: [false, ['true', 'false']], person: true,
-                   protocol: true, sendTime: [true, U.isTime],
+                   protocol: true, sendTime: [true, validTime],
                    frequency: [true, frequencies]},
     updateParams: {active: [false, ['true', 'false']],
-                   sendTime: [false, U.isTime],
+                   sendTime: [false, validTime],
                    frequency: [false, frequencies]}
 };
 var cleaner = loch.allower(API.publicFields);
 var createValidator = _.partial(loch.validates, API.createParams);
 var updateValidator = _.partial(loch.validates, API.updateParams);
 
-var frequencies  = ['sundays', 'mondays', 'tuesdays', 'wednesdays',
-                    'thursdays', 'fridays', 'saturdays', 'daily',
-                    'once'];
+var validTime = function(str, key) {
+    var timeRegEx = /^([01]?\d)|(2[01234])$/; // 0 - 24
+    if (timeRegEx.test(str)) return true;
+    else return key + " must be a valid send time, 0-24";
+}
+var frequencies = ['sundays', 'mondays', 'tuesdays', 'wednesdays',
+                    'thursdays', 'fridays', 'saturdays', 'daily', 'once'];
 
 
 exports.getSchedules = function (req, res) {

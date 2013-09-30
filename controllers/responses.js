@@ -10,15 +10,12 @@ var _        = require('underscore'),
     logger   = require('../lib/logger').logger;
 
 var API = {
-    publicFields: {_id: U._idToId, person: null, state: null,
-                   protocolInstance: null, messageName: null,
-                   intent: null, createdAt: null,
-                   text: null, completedAt: null},
-    createParams: {state: true, protocolInstance: true,
-                   completedAt: false, text: false,
-                   messageName: false},
-    updateParams: {completedAt: false, responseText: false,
-                   messageName: false}
+    publicFields: {_id: U._idToId, person: null, state: null, text: null,
+                   protocolInstance: null, messageName: null, createdAt: null,
+                   completedAt: null},
+    createParams: {state: true, protocolInstance: true, text: false,
+                   messageName: true},
+    updateParams: {text: false}
 };
 var cleaner = loch.allower(API.publicFields);
 var createValidator = _.partial(loch.validates, API.createParams);
