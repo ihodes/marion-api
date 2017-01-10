@@ -8,7 +8,7 @@ Make sure [nodejs](http://nodejs.org/) is installed, along with [mongodb](http:/
 
 Foreman (installed with the [Heroku toolbelt](https://toolbelt.heroku.com/)) must also be installed.
 
-For testing, [mocha](http://visionmedia.github.io/mocha/) must be installed.
+For testing, [mocha](http://mochajs.org/) must be installed.
 
     npm install # installs packages
     make # starts the application server
